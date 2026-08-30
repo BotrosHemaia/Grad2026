@@ -5,8 +5,16 @@
  * Usage:
  *   node scripts/seedSeats.mjs
  *
- * Requires the same VITE_FIREBASE_* values as the app, read from
- * .env.local in the project root (falls back to process.env).
+ * Requires the same VITE_FIREBASE_* values as the app, plus admin
+ * credentials, read from .env.local in the project root (falls back to
+ * process.env):
+ *   SEED_ADMIN_EMAIL=admin@example.com
+ *   SEED_ADMIN_PASSWORD=your-admin-password
+ *
+ * firestore.rules requires an authenticated admin session to *create*
+ * seat documents, so this script signs in with those credentials before
+ * writing (using an existing user created in Firebase Console >
+ * Authentication > Users — this script does not create accounts).
  *
  * Edit SEAT_LAYOUT below to match your venue (rows x seats-per-row, or a
  * flat list of custom labels).
@@ -16,6 +24,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { initializeApp } from 'firebase/app'
 import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -64,10 +73,25 @@ const SEAT_LAYOUT = ROWS.flatMap((row) =>
 )
 // -----------------------------------------------------------------------
 
+const adminEmail = process.env.SEED_ADMIN_EMAIL
+const adminPassword = process.env.SEED_ADMIN_PASSWORD
+
+if (!adminEmail || !adminPassword) {
+  console.error(
+    'Missing admin credentials. Add SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD to .env.local ' +
+      '(use an existing user from Firebase Console > Authentication > Users).'
+  )
+  process.exit(1)
+}
+
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
+const auth = getAuth(app)
 
 async function main() {
+  console.log(`Signing in as ${adminEmail}...`)
+  await signInWithEmailAndPassword(auth, adminEmail, adminPassword)
+
   const seatsCol = collection(db, 'seats')
 
   const existing = await getDocs(seatsCol)
