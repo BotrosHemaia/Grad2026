@@ -1,0 +1,5 @@
+# SPA fallback for Cloudflare Pages: this is a single-page app that does its
+# own client-side routing (see src/main.tsx — it inspects window.location).
+# Without this, a hard refresh on /admin would 404 because there's no
+# physical /admin/index.html file.
+/*    /index.html   200

@@ -3,24 +3,68 @@ rules_version = '2';
 /**
  * Firestore security rules for the Graduation Party Seat Reservation System.
  *
- * NOTE: This starter ruleset allows open read/write so the app is easy to
- * develop against immediately. Before going to production, tighten this to
- * require authentication (e.g. Firebase Auth for servants/admins) and
- * validate document shape server-side. See TODOs below.
+ * - Guests (unauthenticated) need to READ the live seat map and WRITE a new
+ *   reservation + lock seats to 'Pending' via the booking form. This is the
+ *   one unauthenticated write path the app relies on, so it stays open but
+ *   scoped as tightly as declarative rules allow (see isGuestBooking below).
+ * - Everything else (blocking/unblocking seats, approving/cancelling
+ *   reservations, editing existing documents) requires an authenticated
+ *   Admin session — enforced both here and via the Admin Dashboard's
+ *   Firebase Auth login gate.
+ *
+ * NOTE: Firestore rules cannot fully replicate the seat-availability
+ * transaction check the app performs client-side (that logic lives in
+ * src/services/reservationService.ts). These rules provide defense-in-depth
+ * (shape validation, auth gating) — they are not a substitute for the
+ * transactional application logic.
  */
 service cloud.firestore {
   match /databases/{database}/documents {
 
     match /seats/{seatId} {
       allow read: if true;
-      // TODO: restrict writes to authenticated servant/admin accounts only.
-      allow write: if true;
+      // Admins can freely update seat status (block/unblock, approve/cancel
+      // effects, manual fixes) and manage seat documents.
+      // Guests get exactly one narrow unauthenticated path: locking a seat
+      // they are booking from 'Available' -> 'Pending' as part of the
+      // booking-form transaction (reservationService.createReservation).
+      allow update: if request.auth != null || isGuestSeatLock();
+      allow create, delete: if request.auth != null;
+    }
+
+    function isGuestSeatLock() {
+      let before = resource.data;
+      let after = request.resource.data;
+      return before.status == 'Available'
+        && after.status == 'Pending'
+        && after.seat_number == before.seat_number
+        && after.reservation_id is string;
     }
 
     match /reservations/{reservationId} {
       allow read: if true;
-      // TODO: restrict writes to authenticated servant/admin accounts only.
-      allow write: if true;
+
+      // Guests may create a reservation (the booking form) without being
+      // signed in, as long as the payload has the expected shape and seat
+      // cap. The seat-availability race check itself happens in the
+      // transaction client-side; this only validates document shape.
+      allow create: if request.auth != null || isValidGuestReservation();
+
+      // Only signed-in admins may edit or delete existing reservations
+      // (Approve / Cancel actions).
+      allow update, delete: if request.auth != null;
+    }
+
+    function isValidGuestReservation() {
+      let data = request.resource.data;
+      return data.keys().hasAll(
+        ['guest_name', 'phone_number', 'payment_method', 'servant_name', 'seat_ids', 'created_at']
+      )
+        && data.guest_name is string && data.guest_name.size() > 0
+        && data.phone_number is string && data.phone_number.size() > 0
+        && (data.payment_method == 'Cash' || data.payment_method == 'InstaPay')
+        && data.servant_name is string && data.servant_name.size() > 0
+        && data.seat_ids is list && data.seat_ids.size() > 0 && data.seat_ids.size() <= 4;
     }
   }
 }

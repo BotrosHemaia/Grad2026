@@ -15,6 +15,7 @@ import {
   where,
   orderBy,
   onSnapshot,
+  runTransaction,
   type Unsubscribe,
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
@@ -69,6 +70,41 @@ export async function setSeatStatus(seatId: string, status: SeatStatus): Promise
 /** Delete a seat document entirely. */
 export async function deleteSeat(seatId: string): Promise<void> {
   await deleteDoc(doc(db, COLLECTIONS.SEATS, seatId))
+}
+
+/**
+ * Admin action: block a currently 'Available' seat (mark it VIP-only /
+ * unbookable). Runs in a transaction so it cannot race against a guest's
+ * `createReservation` transaction — whichever commits first wins, and the
+ * loser sees a clear error instead of silently corrupting state.
+ */
+export async function blockSeat(seatId: string): Promise<void> {
+  await runTransaction(db, async (tx) => {
+    const ref = doc(db, COLLECTIONS.SEATS, seatId)
+    const snap = await tx.get(ref)
+    if (!snap.exists()) throw new Error('Seat not found.')
+    const status = (snap.data() as Seat).status
+    if (status !== 'Available') {
+      throw new Error(`Seat is currently '${status}' and cannot be blocked.`)
+    }
+    tx.update(ref, { status: 'Blocked' })
+  })
+}
+
+/**
+ * Admin action: unblock a 'Blocked' seat, returning it to 'Available'.
+ */
+export async function unblockSeat(seatId: string): Promise<void> {
+  await runTransaction(db, async (tx) => {
+    const ref = doc(db, COLLECTIONS.SEATS, seatId)
+    const snap = await tx.get(ref)
+    if (!snap.exists()) throw new Error('Seat not found.')
+    const status = (snap.data() as Seat).status
+    if (status !== 'Blocked') {
+      throw new Error(`Seat is currently '${status}', not Blocked.`)
+    }
+    tx.update(ref, { status: 'Available' })
+  })
 }
 
 /**

@@ -1,17 +1,12 @@
-/** Static color-coding legend shown above/below the seat grid. */
-export default function SeatLegend() {
-  const items: { label: string; colorClass: string }[] = [
-    { label: 'Available', colorClass: 'bg-green-500' },
-    { label: 'Pending', colorClass: 'bg-gray-400' },
-    { label: 'Confirmed', colorClass: 'bg-black' },
-    { label: 'Blocked (VIP)', colorClass: 'bg-red-500' },
-  ]
+import { SEAT_STATUS_STYLES, SEAT_STATUS_LEGEND } from '../utils/seatColors'
 
+/** Static color-coding legend shown above/below any seat grid. */
+export default function SeatLegend() {
   return (
     <div id="seat-legend" className="flex flex-wrap items-center gap-4 justify-center py-2">
-      {items.map((item) => (
+      {SEAT_STATUS_LEGEND.map((item) => (
         <div key={item.label} className="flex items-center gap-2">
-          <span className={`w-4 h-4 rounded-md inline-block ${item.colorClass}`} />
+          <span className={`w-4 h-4 rounded-md inline-block ${SEAT_STATUS_STYLES[item.status]}`} />
           <span className="text-sm text-gray-700">{item.label}</span>
         </div>
       ))}

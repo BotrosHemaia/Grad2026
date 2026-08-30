@@ -27,6 +27,9 @@ function App() {
 
       <footer id="app-footer" className="text-center text-xs text-gray-400 py-6">
         <p>Backend: Firebase Firestore</p>
+        <a href="/admin" className="hover:text-gray-600 underline">
+          Admin Login
+        </a>
       </footer>
     </div>
   )
