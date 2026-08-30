@@ -75,9 +75,16 @@ export async function deleteSeat(seatId: string): Promise<void> {
  * Subscribe to realtime updates for the full seat map. Returns an
  * unsubscribe function — call it on component unmount / cleanup.
  */
-export function subscribeToSeats(callback: (seats: Seat[]) => void): Unsubscribe {
+export function subscribeToSeats(
+  callback: (seats: Seat[]) => void,
+  onError?: (error: Error) => void
+): Unsubscribe {
   const q = query(seatsCol, orderBy('seat_number'))
-  return onSnapshot(q, (snap) => {
-    callback(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Seat, 'id'>) })))
-  })
+  return onSnapshot(
+    q,
+    (snap) => {
+      callback(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Seat, 'id'>) })))
+    },
+    (error) => onError?.(error)
+  )
 }
