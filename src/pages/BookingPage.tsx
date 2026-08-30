@@ -149,7 +149,7 @@ export default function BookingPage({ onBack }: BookingPageProps) {
   }
 
   return (
-    <div id="booking-page" className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+    <div id="booking-page" className="max-w-6xl mx-auto px-4 py-6 space-y-6">
       <div className="flex items-center gap-3">
         <button
           type="button"

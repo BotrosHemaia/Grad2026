@@ -20,6 +20,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { COLLECTIONS, type Seat, type NewSeatInput, type SeatStatus } from '../types/models'
+import { generateSeatDefinitions } from '../config/theaterLayout'
 
 const seatsCol = collection(db, COLLECTIONS.SEATS)
 
@@ -47,11 +48,18 @@ export async function createSeat(seat: NewSeatInput): Promise<string> {
   return ref.id
 }
 
-/** Bulk-create seats, e.g. "A1".."A20". Returns the generated IDs in order. */
-export async function createSeatsBulk(seatNumbers: string[]): Promise<string[]> {
+/**
+ * Bulk-create every seat defined by the theater layout config
+ * (src/config/theaterLayout.ts). Returns the generated IDs in order.
+ * Prefer running scripts/seedSeats.mjs for initial venue setup (it
+ * authenticates as an admin and checks for an existing seat before
+ * writing); this in-app helper exists for programmatic reseeding from
+ * within the authenticated admin UI if ever needed.
+ */
+export async function createSeatsBulk(seats: NewSeatInput[] = generateSeatDefinitions()): Promise<string[]> {
   const ids: string[] = []
-  for (const seat_number of seatNumbers) {
-    const id = await createSeat({ seat_number, status: 'Available', reservation_id: null })
+  for (const seat of seats) {
+    const id = await createSeat(seat)
     ids.push(id)
   }
   return ids

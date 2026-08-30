@@ -138,7 +138,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div id="admin-dashboard-page" className="max-w-5xl mx-auto px-4 py-6 space-y-8">
+    <div id="admin-dashboard-page" className="max-w-6xl mx-auto px-4 py-6 space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
         <button
@@ -235,7 +235,7 @@ export default function AdminDashboardPage() {
         />
       </section>
 
-      {/* --- Confirmed Reservations (read-only, for "who booked which seat") --- */}
+      {/* --- Confirmed Reservations (who booked which seat + admin-only Cancel) --- */}
       <section
         id="admin-confirmed-section"
         aria-label="Confirmed Reservations"
@@ -245,14 +245,15 @@ export default function AdminDashboardPage() {
           Confirmed Reservations ({confirmedReservations.length})
         </h2>
         <p className="text-xs text-gray-400 mb-3">
-          Approved bookings, kept here for reference so you always know who reserved which seat.
+          Approved bookings — kept here so you always know who reserved which seat. Cancelling a
+          confirmed reservation here releases its seats back to Available and removes the booking.
         </p>
 
         <ReservationsTable
           reservations={confirmedReservations}
           seatsById={seatsById}
           processingIds={processingReservationIds}
-          readOnly
+          onCancel={handleCancel}
           emptyMessage="No confirmed reservations yet."
           emptyMessageId="no-confirmed-reservations"
         />

@@ -40,7 +40,7 @@ export default function AdminSeat({ seat, blockModeOn, isUpdating, onClick, rese
       disabled={!isClickable}
       title={tooltip}
       className={[
-        'w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-md text-xs font-semibold flex items-center justify-center transition-transform',
+        'w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-md text-[10px] sm:text-xs font-semibold flex items-center justify-center transition-transform',
         SEAT_STATUS_STYLES[seat.status],
         isToggleable ? 'ring-2 ring-offset-1 ring-yellow-400' : '',
         isClickable ? 'cursor-pointer hover:scale-105' : '',
@@ -48,7 +48,7 @@ export default function AdminSeat({ seat, blockModeOn, isUpdating, onClick, rese
         !isToggleable && blockModeOn ? 'opacity-60' : '',
       ].join(' ')}
     >
-      {seat.seat_number}
+      {seat.seat_index}
     </button>
   )
 }
