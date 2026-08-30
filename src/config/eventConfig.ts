@@ -16,11 +16,10 @@ export const EVENT_CONFIG = {
  * Edit this list to match your event staff.
  */
 export const SERVANT_NAMES: string[] = [
-  'Ahmed Hassan',
-  'Sara Mahmoud',
-  'Youssef Ali',
-  'Mona Khaled',
-  'Omar Tarek',
+  'Mina Atta',
+  'Mina Adel',
+  'Marina',
+  'Aml',
 ]
 
 /** Maximum number of seats a single guest may select/reserve at once. */
