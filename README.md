@@ -62,6 +62,17 @@ Rendered top-to-bottom, matching the physical room: **Stage/Screen** at the very
 
 Rendering: `src/components/TheaterSeatMap.tsx` is a shared component (used by both the guest `SeatGrid` and the admin `AdminSeatGrid` via a `renderSeat` render-prop) that walks this layout (in `THEATER_LAYOUT` array order — Main Floor first, then Balcony) and renders each section with a title, each row with a row label, a Left seat block, a visible dashed-line **aisle gap**, and a Right seat block — so the guest and admin views are always structurally identical, and only the individual seat cell's clickability/tooltip differs.
 
+## Visual Design — "University Graduation" Theme
+The UI uses a premium **Navy Blue + Gold + White/Light Gray** color palette to feel like a formal graduation invitation, implemented via a Tailwind CSS **CDN** build (no PostCSS pipeline):
+- **`index.html`** loads `https://cdn.tailwindcss.com` then immediately sets `tailwind.config = {...}` (must come *after* the CDN script, or the custom theme silently no-ops) extending `theme.colors` with a full `navy` and `gold` shade scale, `theme.fontFamily.display` (Playfair Display, for headings) / body sans (Inter, via Google Fonts `<link>`), and two custom shadows (`shadow-gold-glow`, `shadow-navy-lg`).
+- **Hero section** (`WelcomePage.tsx`) — a navy `#hero-section` with soft gold blur accents, a gold graduation-cap badge, serif event title, glass-effect date/venue cards, and a pill-shaped gold **Book Now** CTA.
+- **Mobile-first seat map** (`TheaterSeatMap.tsx`) — the root `#theater-seat-map` keeps `overflow-x-auto` (plus `scroll-touch` for `-webkit-overflow-scrolling: touch` and a `thin-scrollbar` custom scrollbar) so on narrow viewports guests can swipe left/right through the full-width seat grid without the page itself overflowing; a "Swipe to see all seats" hint shows only on small screens (`sm:hidden`).
+- **Seat color-coding is unchanged** — `src/utils/seatColors.ts` (`SEAT_STATUS_STYLES`: Available=green, Pending=gray, Confirmed=black, Blocked=red) was not touched; only hover/transition/ring polish was added around it in `Seat.tsx` / `AdminSeat.tsx` (scale + shadow on hover, gold ring on selection).
+- **BookingForm.tsx** is a modern elevated white card with a navy "selected seats" summary panel (gold accent bar) and a gold submit button.
+- Admin pages (`AdminLoginPage.tsx`, `AdminDashboardPage.tsx`, `ReservationsTable.tsx`) use the same navy/gold palette for visual consistency with the guest-facing flow.
+
+This was a **pure visual/CSS redesign** — no changes to the Firestore data model, seat layout structure/counts, click/selection logic, or any DOM `id` relied on elsewhere (`#book-now-button`, `#theater-seat-map`, `#seat-{id}`, `#booking-form`, etc. are all preserved).
+
 ## Data Architecture
 
 ### Firestore Collections
