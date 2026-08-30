@@ -118,29 +118,30 @@ export default function BookingPage({ onBack }: BookingPageProps) {
 
   if (successInfo) {
     return (
-      <div id="booking-success" className="max-w-md mx-auto text-center bg-white rounded-2xl shadow-xl p-8 space-y-4 mt-10">
-        <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-100 text-green-600 text-2xl mx-auto">
+      <div id="booking-success" className="max-w-md mx-auto text-center bg-white rounded-2xl shadow-navy-lg ring-1 ring-navy-100 p-8 space-y-4 mt-10 mb-10 animate-[fadeIn_0.3s_ease-out]">
+        <span className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 text-2xl mx-auto ring-4 ring-green-50">
           <i className="fas fa-check" aria-hidden="true"></i>
         </span>
-        <h2 className="text-xl font-bold text-gray-900">Seats Reserved!</h2>
+        <h2 className="font-display text-2xl font-bold text-navy-900">Seats Reserved!</h2>
         <p className="text-gray-600">
-          Seat(s) <strong>{successInfo.seatNumbers.join(', ')}</strong> are now on hold for you
+          Seat(s) <strong className="text-navy-800">{successInfo.seatNumbers.join(', ')}</strong> are now on hold for you
           (status: <em>Pending</em>).
         </p>
-        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-2">
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-2.5">
+          <i className="fas fa-triangle-exclamation mr-1.5" aria-hidden="true"></i>
           Payment must be completed within 1 hour to confirm your reservation.
         </p>
         <button
           type="button"
           onClick={() => setSuccessInfo(null)}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors"
+          className="w-full bg-navy-800 hover:bg-navy-700 text-white font-semibold py-2.5 rounded-lg transition-colors duration-200"
         >
           Book More Seats
         </button>
         <button
           type="button"
           onClick={onBack}
-          className="w-full text-gray-500 hover:text-gray-700 text-sm"
+          className="w-full text-gray-500 hover:text-navy-700 text-sm transition-colors duration-200"
         >
           Back to Welcome Page
         </button>
@@ -149,16 +150,16 @@ export default function BookingPage({ onBack }: BookingPageProps) {
   }
 
   return (
-    <div id="booking-page" className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+    <div id="booking-page" className="max-w-6xl mx-auto px-4 py-6 sm:py-8 space-y-6">
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onBack}
-          className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1"
+          className="text-gray-500 hover:text-navy-700 text-sm flex items-center gap-1.5 transition-colors duration-200"
         >
           <i className="fas fa-arrow-left" aria-hidden="true"></i> Back
         </button>
-        <h2 className="text-xl font-bold text-gray-900">Select Your Seats</h2>
+        <h2 className="font-display text-xl sm:text-2xl font-bold text-navy-900">Select Your Seats</h2>
       </div>
 
       {connectionError && (
@@ -168,11 +169,16 @@ export default function BookingPage({ onBack }: BookingPageProps) {
       )}
 
       {loading ? (
-        <p className="text-center text-gray-500 py-10">Loading seat map…</p>
+        <p className="text-center text-gray-500 py-10">
+          <i className="fas fa-circle-notch fa-spin mr-2" aria-hidden="true"></i>
+          Loading seat map…
+        </p>
       ) : (
         <>
-          <SeatLegend />
-          <div className="bg-white rounded-2xl shadow-md p-4">
+          <div className="bg-white rounded-2xl shadow-md ring-1 ring-gray-100 p-3">
+            <SeatLegend />
+          </div>
+          <div className="bg-white rounded-2xl shadow-md ring-1 ring-gray-100 p-4 sm:p-6">
             <SeatGrid
               seats={seats}
               selectedSeatIds={selectedSeatIds}

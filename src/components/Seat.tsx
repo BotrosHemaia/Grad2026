@@ -35,11 +35,12 @@ export default function Seat({ seat, isSelected, disabled, onToggle }: SeatProps
       aria-label={`Seat ${seat.seat_number} — ${seat.status}${isSelected ? ' — selected' : ''}`}
       title={`Seat ${seat.seat_number} — ${seat.status}`}
       className={[
-        'w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-md text-[10px] sm:text-xs font-semibold flex items-center justify-center transition-transform',
+        'w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-md text-[10px] sm:text-xs font-semibold flex items-center justify-center',
+        'transition-all duration-150 ease-out',
         SEAT_STATUS_STYLES[seat.status],
-        seat.status === 'Available' ? 'hover:bg-green-600' : '',
-        isSelected ? 'ring-4 ring-blue-500 ring-offset-1 scale-105' : '',
-        isClickable ? 'cursor-pointer hover:scale-105' : 'cursor-not-allowed opacity-90',
+        seat.status === 'Available' ? 'hover:bg-green-600 hover:shadow-md hover:shadow-green-500/40' : '',
+        isSelected ? 'ring-4 ring-gold-500 ring-offset-1 scale-110 shadow-gold-glow' : '',
+        isClickable ? 'cursor-pointer hover:scale-110 active:scale-95' : 'cursor-not-allowed opacity-90',
       ].join(' ')}
     >
       {seat.seat_index}

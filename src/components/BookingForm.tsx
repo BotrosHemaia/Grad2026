@@ -18,6 +18,11 @@ interface BookingFormProps {
 
 const PHONE_PATTERN = /^[0-9+\-\s]{7,20}$/
 
+const inputClasses =
+  'w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-navy-900 placeholder:text-gray-400 ' +
+  'focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 disabled:bg-gray-100 ' +
+  'transition-colors duration-150'
+
 /**
  * Booking form shown below the seat grid. Displays the currently selected
  * seat numbers and collects guest details required to create a
@@ -75,19 +80,28 @@ export default function BookingForm({
     <form
       id="booking-form"
       onSubmit={handleSubmit}
-      className="max-w-md mx-auto bg-white rounded-xl shadow-md p-6 space-y-4"
+      className="max-w-md mx-auto bg-white rounded-2xl shadow-navy-lg ring-1 ring-gray-100 p-6 sm:p-7 space-y-5"
     >
-      <div id="selected-seats-summary" className="rounded-lg bg-blue-50 border border-blue-200 p-3">
-        <p className="text-sm font-medium text-blue-900">
-          Selected seats ({selectedSeatNumbers.length}/{MAX_SEATS_PER_BOOKING}):
+      <div className="text-center">
+        <h3 className="font-display text-lg font-bold text-navy-900">Reservation Details</h3>
+        <p className="text-xs text-gray-400 mt-0.5">Fill in your information to confirm your seats</p>
+      </div>
+
+      <div
+        id="selected-seats-summary"
+        className="rounded-xl bg-navy-900 p-4 relative overflow-hidden"
+      >
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-gold-500 via-gold-300 to-gold-500"></div>
+        <p className="text-xs font-medium text-navy-100/70 uppercase tracking-wider">
+          Selected seats ({selectedSeatNumbers.length}/{MAX_SEATS_PER_BOOKING})
         </p>
-        <p className="text-lg font-bold text-blue-700 mt-1">
+        <p className="text-xl font-bold text-gold-400 mt-1 font-display">
           {hasSeats ? selectedSeatNumbers.join(', ') : 'None selected yet'}
         </p>
       </div>
 
       <div>
-        <label htmlFor="guest-name-input" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="guest-name-input" className="block text-sm font-medium text-navy-800 mb-1.5">
           Full Name
         </label>
         <input
@@ -97,12 +111,12 @@ export default function BookingForm({
           onChange={(e) => setGuestName(e.target.value)}
           placeholder="e.g. Jane Doe"
           disabled={submitting}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+          className={inputClasses}
         />
       </div>
 
       <div>
-        <label htmlFor="phone-number-input" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="phone-number-input" className="block text-sm font-medium text-navy-800 mb-1.5">
           Phone Number
         </label>
         <input
@@ -112,12 +126,12 @@ export default function BookingForm({
           onChange={(e) => setPhoneNumber(e.target.value)}
           placeholder="e.g. 01012345678"
           disabled={submitting}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+          className={inputClasses}
         />
       </div>
 
       <div>
-        <label htmlFor="payment-method-select" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="payment-method-select" className="block text-sm font-medium text-navy-800 mb-1.5">
           Payment Method
         </label>
         <select
@@ -125,7 +139,7 @@ export default function BookingForm({
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
           disabled={submitting}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+          className={inputClasses}
         >
           <option value="Cash">Cash</option>
           <option value="InstaPay">InstaPay</option>
@@ -133,7 +147,7 @@ export default function BookingForm({
       </div>
 
       <div>
-        <label htmlFor="servant-name-select" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="servant-name-select" className="block text-sm font-medium text-navy-800 mb-1.5">
           Servant Name
         </label>
         <select
@@ -141,7 +155,7 @@ export default function BookingForm({
           value={servantName}
           onChange={(e) => setServantName(e.target.value)}
           disabled={submitting}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+          className={inputClasses}
         >
           <option value="" disabled>
             Select the staff member helping you…
@@ -154,14 +168,15 @@ export default function BookingForm({
         </select>
       </div>
 
-      <p id="payment-disclaimer" className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-md p-2">
-        <i className="fas fa-triangle-exclamation mr-1" aria-hidden="true"></i>
+      <p id="payment-disclaimer" className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5">
+        <i className="fas fa-triangle-exclamation mr-1.5" aria-hidden="true"></i>
         Payment must be completed within 1 hour to confirm reservation. Unpaid seats will be
         released back to Available.
       </p>
 
       {(validationError || errorMessage) && (
-        <p id="booking-form-error" className="text-sm text-red-700 bg-red-100 rounded-md p-2">
+        <p id="booking-form-error" className="text-sm text-red-700 bg-red-100 rounded-lg p-2.5">
+          <i className="fas fa-circle-exclamation mr-1.5" aria-hidden="true"></i>
           {validationError || errorMessage}
         </p>
       )}
@@ -169,9 +184,15 @@ export default function BookingForm({
       <button
         type="submit"
         disabled={submitting || !hasSeats}
-        className="w-full rounded-md bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2.5 transition-colors"
+        className="w-full rounded-lg bg-gold-500 hover:bg-gold-400 active:scale-[0.99] disabled:bg-gray-300 disabled:cursor-not-allowed text-navy-900 font-bold py-3 transition-all duration-150 shadow-gold-glow disabled:shadow-none"
       >
-        {submitting ? 'Reserving…' : `Reserve ${selectedSeatNumbers.length || ''} Seat${selectedSeatNumbers.length === 1 ? '' : 's'}`}
+        {submitting ? (
+          <span className="inline-flex items-center gap-2">
+            <i className="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Reserving…
+          </span>
+        ) : (
+          `Reserve ${selectedSeatNumbers.length || ''} Seat${selectedSeatNumbers.length === 1 ? '' : 's'}`
+        )}
       </button>
     </form>
   )

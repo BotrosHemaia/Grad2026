@@ -33,60 +33,76 @@ export default function TheaterSeatMap({ seats, renderSeat }: TheaterSeatMapProp
   }
 
   return (
-    <div id="theater-seat-map" className="flex flex-col items-center gap-8 py-4 overflow-x-auto">
-      <div className="px-6 py-1.5 bg-gray-800 text-white rounded-full text-xs uppercase tracking-widest">
-        Stage / Screen
-      </div>
+    <div>
+      {/* Mobile swipe hint — only visible on small screens, hints that the
+          map below can be scrolled horizontally. Purely decorative. */}
+      <p className="sm:hidden flex items-center justify-center gap-1.5 text-[11px] text-navy-400 font-medium mb-2">
+        <i className="fas fa-arrow-left" aria-hidden="true"></i>
+        Swipe to see all seats
+        <i className="fas fa-arrow-right" aria-hidden="true"></i>
+      </p>
 
-      {sections.map((section) => (
-        <section
-          key={section.id}
-          id={`theater-section-${section.id}`}
-          aria-label={section.label}
-          className="flex flex-col items-center gap-2 w-full"
-        >
-          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 border-b-2 border-gray-300 pb-1 px-4">
-            {section.label}
-          </h3>
-
-          <div className="flex flex-col items-center gap-1">
-            {section.rows.map((row) => (
-              <div key={row.row} className="flex items-center gap-1">
-                <span className="w-9 shrink-0 text-[10px] font-semibold text-gray-400 text-right">
-                  R{row.row}
-                </span>
-
-                {/* Left block: rendered outward-from-aisle already, so the
-                    first item here is farthest from the aisle and the last
-                    item sits right next to the gap. */}
-                <div className="flex gap-1">
-                  {row.leftSeats.map((seat) => (
-                    <span key={seat.id}>{renderSeat(seat)}</span>
-                  ))}
-                </div>
-
-                {/* Center aisle — a visible gap (with a faint divider line)
-                    representing the physical walkway between the Left and
-                    Right seat blocks. */}
-                <div
-                  className="w-5 sm:w-6 h-6 shrink-0 flex items-center justify-center"
-                  aria-hidden="true"
-                  title="Aisle"
-                >
-                  <div className="w-px h-full border-l border-dashed border-gray-300" />
-                </div>
-
-                {/* Right block: index 1 (nearest aisle) first. */}
-                <div className="flex gap-1">
-                  {row.rightSeats.map((seat) => (
-                    <span key={seat.id}>{renderSeat(seat)}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
+      <div
+        id="theater-seat-map"
+        className="flex flex-col items-center gap-8 py-4 overflow-x-auto scroll-touch thin-scrollbar"
+      >
+        <div className="min-w-max flex flex-col items-center gap-8 w-full px-1">
+          <div className="px-8 py-2 bg-navy-900 text-white rounded-full text-xs uppercase tracking-widest shadow-navy-lg flex items-center gap-2">
+            <i className="fas fa-film text-gold-400" aria-hidden="true"></i>
+            Stage / Screen
           </div>
-        </section>
-      ))}
+
+          {sections.map((section) => (
+            <section
+              key={section.id}
+              id={`theater-section-${section.id}`}
+              aria-label={section.label}
+              className="flex flex-col items-center gap-2 w-full"
+            >
+              <h3 className="text-sm font-bold uppercase tracking-widest text-navy-700 border-b-2 border-gold-400 pb-1 px-4">
+                {section.label}
+              </h3>
+
+              <div className="flex flex-col items-center gap-1">
+                {section.rows.map((row) => (
+                  <div key={row.row} className="flex items-center gap-1">
+                    <span className="w-9 shrink-0 text-[10px] font-semibold text-navy-300 text-right">
+                      R{row.row}
+                    </span>
+
+                    {/* Left block: rendered outward-from-aisle already, so the
+                        first item here is farthest from the aisle and the last
+                        item sits right next to the gap. */}
+                    <div className="flex gap-1">
+                      {row.leftSeats.map((seat) => (
+                        <span key={seat.id}>{renderSeat(seat)}</span>
+                      ))}
+                    </div>
+
+                    {/* Center aisle — a visible gap (with a faint divider line)
+                        representing the physical walkway between the Left and
+                        Right seat blocks. */}
+                    <div
+                      className="w-5 sm:w-6 h-6 shrink-0 flex items-center justify-center"
+                      aria-hidden="true"
+                      title="Aisle"
+                    >
+                      <div className="w-px h-full border-l border-dashed border-navy-200" />
+                    </div>
+
+                    {/* Right block: index 1 (nearest aisle) first. */}
+                    <div className="flex gap-1">
+                      {row.rightSeats.map((seat) => (
+                        <span key={seat.id}>{renderSeat(seat)}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

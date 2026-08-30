@@ -24,8 +24,11 @@ export default function AdminApp() {
 
   if (!authChecked) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-500">Checking admin session…</p>
+      <div className="min-h-screen flex items-center justify-center bg-navy-900">
+        <p className="text-navy-100/70 text-sm">
+          <i className="fas fa-circle-notch fa-spin mr-2" aria-hidden="true"></i>
+          Checking admin session…
+        </p>
       </div>
     )
   }

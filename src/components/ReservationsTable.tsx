@@ -47,25 +47,26 @@ export default function ReservationsTable({
 
   if (reservations.length === 0) {
     return (
-      <p id={emptyMessageId} className="text-center text-gray-500 py-8">
+      <p id={emptyMessageId} className="text-center text-gray-400 py-8">
+        <i className="fas fa-inbox mr-1.5" aria-hidden="true"></i>
         {emptyMessage}
       </p>
     )
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto scroll-touch thin-scrollbar rounded-xl ring-1 ring-gray-100">
       <table id="reservations-table" className="min-w-full divide-y divide-gray-200 text-sm">
-        <thead className="bg-gray-50">
+        <thead className="bg-navy-50">
           <tr>
-            <th className="px-3 py-2 text-left font-semibold text-gray-600">Guest</th>
-            <th className="px-3 py-2 text-left font-semibold text-gray-600">Phone</th>
-            <th className="px-3 py-2 text-left font-semibold text-gray-600">Seats</th>
-            <th className="px-3 py-2 text-left font-semibold text-gray-600">Payment</th>
-            <th className="px-3 py-2 text-left font-semibold text-gray-600">Servant</th>
-            <th className="px-3 py-2 text-left font-semibold text-gray-600">Requested</th>
+            <th className="px-3 py-2.5 text-left font-semibold text-navy-700 uppercase text-xs tracking-wide">Guest</th>
+            <th className="px-3 py-2.5 text-left font-semibold text-navy-700 uppercase text-xs tracking-wide">Phone</th>
+            <th className="px-3 py-2.5 text-left font-semibold text-navy-700 uppercase text-xs tracking-wide">Seats</th>
+            <th className="px-3 py-2.5 text-left font-semibold text-navy-700 uppercase text-xs tracking-wide">Payment</th>
+            <th className="px-3 py-2.5 text-left font-semibold text-navy-700 uppercase text-xs tracking-wide">Servant</th>
+            <th className="px-3 py-2.5 text-left font-semibold text-navy-700 uppercase text-xs tracking-wide">Requested</th>
             {showActions && (
-              <th className="px-3 py-2 text-left font-semibold text-gray-600">Actions</th>
+              <th className="px-3 py-2.5 text-left font-semibold text-navy-700 uppercase text-xs tracking-wide">Actions</th>
             )}
           </tr>
         </thead>
@@ -74,17 +75,17 @@ export default function ReservationsTable({
             const isProcessing = processingIds.has(reservation.id!)
             const seatNumbers = getSeatNumbers(reservation, seatsById)
             return (
-              <tr key={reservation.id} id={`reservation-row-${reservation.id}`}>
-                <td className="px-3 py-2 font-medium text-gray-900">{reservation.guest_name}</td>
-                <td className="px-3 py-2 text-gray-600">{reservation.phone_number}</td>
-                <td className="px-3 py-2 text-gray-600">{seatNumbers.join(', ')}</td>
-                <td className="px-3 py-2 text-gray-600">{reservation.payment_method}</td>
-                <td className="px-3 py-2 text-gray-600">{reservation.servant_name}</td>
-                <td className="px-3 py-2 text-gray-500 whitespace-nowrap">
+              <tr key={reservation.id} id={`reservation-row-${reservation.id}`} className="hover:bg-navy-50/50 transition-colors duration-150">
+                <td className="px-3 py-2.5 font-medium text-navy-900">{reservation.guest_name}</td>
+                <td className="px-3 py-2.5 text-gray-600">{reservation.phone_number}</td>
+                <td className="px-3 py-2.5 text-gray-600 font-medium">{seatNumbers.join(', ')}</td>
+                <td className="px-3 py-2.5 text-gray-600">{reservation.payment_method}</td>
+                <td className="px-3 py-2.5 text-gray-600">{reservation.servant_name}</td>
+                <td className="px-3 py-2.5 text-gray-500 whitespace-nowrap">
                   {formatCreatedAt(reservation.created_at)}
                 </td>
                 {showActions && (
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-2.5">
                     <div className="flex gap-2">
                       {onApprove && (
                         <button
@@ -92,7 +93,7 @@ export default function ReservationsTable({
                           id={`approve-btn-${reservation.id}`}
                           onClick={() => onApprove(reservation)}
                           disabled={isProcessing}
-                          className="rounded-md bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
+                          className="rounded-md bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white text-xs font-semibold px-3 py-1.5 transition-colors duration-150 active:scale-95"
                         >
                           {isProcessing ? '…' : 'Approve'}
                         </button>
@@ -103,7 +104,7 @@ export default function ReservationsTable({
                           id={`cancel-btn-${reservation.id}`}
                           onClick={() => onCancel(reservation)}
                           disabled={isProcessing}
-                          className="rounded-md bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
+                          className="rounded-md bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white text-xs font-semibold px-3 py-1.5 transition-colors duration-150 active:scale-95"
                         >
                           {isProcessing ? '…' : 'Cancel'}
                         </button>

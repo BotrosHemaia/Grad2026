@@ -28,21 +28,26 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div id="admin-login-page" className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div id="admin-login-page" className="min-h-screen flex items-center justify-center bg-navy-900 px-4 relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-gold-500/10 blur-3xl"></div>
+        <div className="absolute bottom-0 -right-24 w-96 h-96 rounded-full bg-navy-500/30 blur-3xl"></div>
+      </div>
+
       <form
         onSubmit={handleSubmit}
-        className="max-w-sm w-full bg-white rounded-2xl shadow-xl p-8 space-y-4"
+        className="relative max-w-sm w-full bg-white rounded-2xl shadow-navy-lg p-8 space-y-4"
       >
         <div className="text-center space-y-1">
-          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-100 text-blue-600 text-2xl mx-auto">
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-navy-900 text-gold-400 text-2xl mx-auto ring-1 ring-gold-400/40">
             <i className="fas fa-lock" aria-hidden="true"></i>
           </span>
-          <h1 className="text-xl font-bold text-gray-900 mt-2">Admin Login</h1>
+          <h1 className="font-display text-xl font-bold text-navy-900 mt-2">Admin Login</h1>
           <p className="text-sm text-gray-500">Sign in to manage seats and reservations.</p>
         </div>
 
         <div>
-          <label htmlFor="admin-email-input" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="admin-email-input" className="block text-sm font-medium text-navy-800 mb-1.5">
             Email
           </label>
           <input
@@ -53,12 +58,12 @@ export default function AdminLoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             disabled={submitting}
             required
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+            className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 disabled:bg-gray-100 transition-colors duration-150"
           />
         </div>
 
         <div>
-          <label htmlFor="admin-password-input" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="admin-password-input" className="block text-sm font-medium text-navy-800 mb-1.5">
             Password
           </label>
           <input
@@ -69,12 +74,13 @@ export default function AdminLoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             disabled={submitting}
             required
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+            className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 disabled:bg-gray-100 transition-colors duration-150"
           />
         </div>
 
         {error && (
-          <p id="admin-login-error" className="text-sm text-red-700 bg-red-100 rounded-md p-2">
+          <p id="admin-login-error" className="text-sm text-red-700 bg-red-100 rounded-lg p-2.5">
+            <i className="fas fa-circle-exclamation mr-1.5" aria-hidden="true"></i>
             {error}
           </p>
         )}
@@ -82,7 +88,7 @@ export default function AdminLoginPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-md bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-semibold py-2.5 transition-colors"
+          className="w-full rounded-lg bg-navy-900 hover:bg-navy-800 disabled:bg-gray-300 text-white font-semibold py-2.5 transition-colors duration-150"
         >
           {submitting ? 'Signing in…' : 'Sign In'}
         </button>
