@@ -4,9 +4,9 @@
  */
 export const EVENT_CONFIG = {
   title: 'Graduation Ceremony & Party 2026',
-  date: 'Saturday, September 12, 2026',
-  time: '7:00 PM – 11:00 PM',
-  venue: 'Grand Ballroom, City Convention Center',
+  date: 'Thursday, October 1, 2026',
+  time: '6:00 PM – 10:00 PM',
+  venue: 'مسرح الملاك طوسون - شبرا',
   description:
     'Join us to celebrate the graduating class of 2026! An evening of music, dinner, and unforgettable memories. Reserve your seat now — spots are limited.',
 }
