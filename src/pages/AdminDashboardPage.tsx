@@ -10,7 +10,11 @@ import { adminSignOut } from '../services/authService'
 import AdminSeatGrid from '../components/AdminSeatGrid'
 import SeatLegend from '../components/SeatLegend'
 import ReservationsTable from '../components/ReservationsTable'
-import { getReservationStatus, indexSeatsById } from '../utils/reservationStatus'
+import {
+  getReservationStatus,
+  indexSeatsById,
+  indexReservationsBySeatId,
+} from '../utils/reservationStatus'
 
 /**
  * Admin Dashboard: real-time theater map + VIP block/unblock toggle mode +
@@ -54,9 +58,15 @@ export default function AdminDashboardPage() {
   }, [])
 
   const seatsById = useMemo(() => indexSeatsById(seats), [seats])
+  const reservationsBySeatId = useMemo(() => indexReservationsBySeatId(reservations), [reservations])
 
   const pendingReservations = useMemo(
     () => reservations.filter((r) => getReservationStatus(r, seatsById) === 'Pending'),
+    [reservations, seatsById]
+  )
+
+  const confirmedReservations = useMemo(
+    () => reservations.filter((r) => getReservationStatus(r, seatsById) === 'Confirmed'),
     [reservations, seatsById]
   )
 
@@ -189,7 +199,14 @@ export default function AdminDashboardPage() {
             blockModeOn={blockModeOn}
             updatingSeatIds={updatingSeatIds}
             onToggleSeat={handleToggleSeat}
+            reservationsBySeatId={reservationsBySeatId}
           />
+        )}
+        {!loading && (
+          <p className="text-xs text-gray-400 mt-2 text-center">
+            <i className="fas fa-circle-info mr-1" aria-hidden="true"></i>
+            Hover over a black (Confirmed) or gray (Pending) seat to see who reserved it.
+          </p>
         )}
       </section>
 
@@ -215,6 +232,29 @@ export default function AdminDashboardPage() {
           processingIds={processingReservationIds}
           onApprove={handleApprove}
           onCancel={handleCancel}
+        />
+      </section>
+
+      {/* --- Confirmed Reservations (read-only, for "who booked which seat") --- */}
+      <section
+        id="admin-confirmed-section"
+        aria-label="Confirmed Reservations"
+        className="bg-white rounded-2xl shadow-md p-4"
+      >
+        <h2 className="text-lg font-semibold text-gray-800 mb-3">
+          Confirmed Reservations ({confirmedReservations.length})
+        </h2>
+        <p className="text-xs text-gray-400 mb-3">
+          Approved bookings, kept here for reference so you always know who reserved which seat.
+        </p>
+
+        <ReservationsTable
+          reservations={confirmedReservations}
+          seatsById={seatsById}
+          processingIds={processingReservationIds}
+          readOnly
+          emptyMessage="No confirmed reservations yet."
+          emptyMessageId="no-confirmed-reservations"
         />
       </section>
     </div>

@@ -1,4 +1,4 @@
-import type { Seat as SeatModel } from '../types/models'
+import type { Seat as SeatModel, Reservation } from '../types/models'
 import { SEAT_STATUS_STYLES } from '../utils/seatColors'
 
 interface AdminSeatProps {
@@ -8,6 +8,8 @@ interface AdminSeatProps {
   /** True while this specific seat's block/unblock request is in flight. */
   isUpdating: boolean
   onClick: (seat: SeatModel) => void
+  /** The reservation currently holding this seat, if any (Pending/Confirmed). */
+  reservation?: Reservation
 }
 
 /**
@@ -17,10 +19,18 @@ interface AdminSeatProps {
  * "Block Mode" is on, 'Available' and 'Blocked' seats become clickable so
  * the admin can toggle VIP blocking; 'Pending' and 'Confirmed' seats stay
  * non-interactive here (manage those via the reservations table instead).
+ *
+ * For 'Pending'/'Confirmed' seats, the hover tooltip shows the reserving
+ * guest's name and phone so admins can always tell who booked which seat —
+ * even after it's been approved and no longer appears in the Pending table.
  */
-export default function AdminSeat({ seat, blockModeOn, isUpdating, onClick }: AdminSeatProps) {
+export default function AdminSeat({ seat, blockModeOn, isUpdating, onClick, reservation }: AdminSeatProps) {
   const isToggleable = blockModeOn && (seat.status === 'Available' || seat.status === 'Blocked')
   const isClickable = isToggleable && !isUpdating
+
+  const tooltip = reservation
+    ? `Seat ${seat.seat_number} — ${seat.status} — ${reservation.guest_name} (${reservation.phone_number})`
+    : `Seat ${seat.seat_number} — ${seat.status}${isToggleable ? ' (click to toggle Block)' : ''}`
 
   return (
     <button
@@ -28,7 +38,7 @@ export default function AdminSeat({ seat, blockModeOn, isUpdating, onClick }: Ad
       id={`admin-seat-${seat.id}`}
       onClick={() => isClickable && onClick(seat)}
       disabled={!isClickable}
-      title={`Seat ${seat.seat_number} — ${seat.status}${isToggleable ? ' (click to toggle Block)' : ''}`}
+      title={tooltip}
       className={[
         'w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-md text-xs font-semibold flex items-center justify-center transition-transform',
         SEAT_STATUS_STYLES[seat.status],

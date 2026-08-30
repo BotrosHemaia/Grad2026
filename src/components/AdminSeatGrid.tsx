@@ -1,4 +1,4 @@
-import type { Seat as SeatModel } from '../types/models'
+import type { Seat as SeatModel, Reservation } from '../types/models'
 import AdminSeat from './AdminSeat'
 import { groupSeatsByRow } from '../utils/seatLayout'
 
@@ -7,6 +7,8 @@ interface AdminSeatGridProps {
   blockModeOn: boolean
   updatingSeatIds: Set<string>
   onToggleSeat: (seat: SeatModel) => void
+  /** Map<seatId, Reservation> — used to show "who booked this seat" tooltips. */
+  reservationsBySeatId: Map<string, Reservation>
 }
 
 /**
@@ -20,6 +22,7 @@ export default function AdminSeatGrid({
   blockModeOn,
   updatingSeatIds,
   onToggleSeat,
+  reservationsBySeatId,
 }: AdminSeatGridProps) {
   const rows = groupSeatsByRow(seats)
 
@@ -44,6 +47,7 @@ export default function AdminSeatGrid({
                 blockModeOn={blockModeOn}
                 isUpdating={updatingSeatIds.has(seat.id!)}
                 onClick={onToggleSeat}
+                reservation={seat.id ? reservationsBySeatId.get(seat.id) : undefined}
               />
             ))}
           </div>

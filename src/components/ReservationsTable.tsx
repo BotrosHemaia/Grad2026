@@ -2,13 +2,20 @@ import type { Reservation, Seat } from '../types/models'
 import { getSeatNumbers } from '../utils/reservationStatus'
 
 interface ReservationsTableProps {
-  /** Reservations to display — caller filters to 'Pending' only. */
+  /** Reservations to display — caller filters to 'Pending' or 'Confirmed'. */
   reservations: Reservation[]
   seatsById: Map<string, Seat>
   /** Reservation IDs currently being approved/cancelled (disables their row's buttons). */
   processingIds: Set<string>
-  onApprove: (reservation: Reservation) => void
-  onCancel: (reservation: Reservation) => void
+  /** Approve/Cancel handlers — omit both (or set readOnly) to hide the Actions column. */
+  onApprove?: (reservation: Reservation) => void
+  onCancel?: (reservation: Reservation) => void
+  /** When true, renders guest/seat/payment details only — no Approve/Cancel actions. */
+  readOnly?: boolean
+  /** Message shown when the reservation list is empty. */
+  emptyMessage?: string
+  /** id applied to the empty-state <p> so callers can target it in tests. */
+  emptyMessageId?: string
 }
 
 function formatCreatedAt(createdAt: unknown): string {
@@ -32,11 +39,16 @@ export default function ReservationsTable({
   processingIds,
   onApprove,
   onCancel,
+  readOnly = false,
+  emptyMessage = 'No pending reservations right now.',
+  emptyMessageId = 'no-pending-reservations',
 }: ReservationsTableProps) {
+  const showActions = !readOnly && Boolean(onApprove || onCancel)
+
   if (reservations.length === 0) {
     return (
-      <p id="no-pending-reservations" className="text-center text-gray-500 py-8">
-        No pending reservations right now.
+      <p id={emptyMessageId} className="text-center text-gray-500 py-8">
+        {emptyMessage}
       </p>
     )
   }
@@ -52,7 +64,9 @@ export default function ReservationsTable({
             <th className="px-3 py-2 text-left font-semibold text-gray-600">Payment</th>
             <th className="px-3 py-2 text-left font-semibold text-gray-600">Servant</th>
             <th className="px-3 py-2 text-left font-semibold text-gray-600">Requested</th>
-            <th className="px-3 py-2 text-left font-semibold text-gray-600">Actions</th>
+            {showActions && (
+              <th className="px-3 py-2 text-left font-semibold text-gray-600">Actions</th>
+            )}
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 bg-white">
@@ -69,28 +83,34 @@ export default function ReservationsTable({
                 <td className="px-3 py-2 text-gray-500 whitespace-nowrap">
                   {formatCreatedAt(reservation.created_at)}
                 </td>
-                <td className="px-3 py-2">
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      id={`approve-btn-${reservation.id}`}
-                      onClick={() => onApprove(reservation)}
-                      disabled={isProcessing}
-                      className="rounded-md bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
-                    >
-                      {isProcessing ? '…' : 'Approve'}
-                    </button>
-                    <button
-                      type="button"
-                      id={`cancel-btn-${reservation.id}`}
-                      onClick={() => onCancel(reservation)}
-                      disabled={isProcessing}
-                      className="rounded-md bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
-                    >
-                      {isProcessing ? '…' : 'Cancel'}
-                    </button>
-                  </div>
-                </td>
+                {showActions && (
+                  <td className="px-3 py-2">
+                    <div className="flex gap-2">
+                      {onApprove && (
+                        <button
+                          type="button"
+                          id={`approve-btn-${reservation.id}`}
+                          onClick={() => onApprove(reservation)}
+                          disabled={isProcessing}
+                          className="rounded-md bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
+                        >
+                          {isProcessing ? '…' : 'Approve'}
+                        </button>
+                      )}
+                      {onCancel && (
+                        <button
+                          type="button"
+                          id={`cancel-btn-${reservation.id}`}
+                          onClick={() => onCancel(reservation)}
+                          disabled={isProcessing}
+                          className="rounded-md bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
+                        >
+                          {isProcessing ? '…' : 'Cancel'}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                )}
               </tr>
             )
           })}
