@@ -1,0 +1,26 @@
+rules_version = '2';
+
+/**
+ * Firestore security rules for the Graduation Party Seat Reservation System.
+ *
+ * NOTE: This starter ruleset allows open read/write so the app is easy to
+ * develop against immediately. Before going to production, tighten this to
+ * require authentication (e.g. Firebase Auth for servants/admins) and
+ * validate document shape server-side. See TODOs below.
+ */
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /seats/{seatId} {
+      allow read: if true;
+      // TODO: restrict writes to authenticated servant/admin accounts only.
+      allow write: if true;
+    }
+
+    match /reservations/{reservationId} {
+      allow read: if true;
+      // TODO: restrict writes to authenticated servant/admin accounts only.
+      allow write: if true;
+    }
+  }
+}
