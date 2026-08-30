@@ -14,11 +14,16 @@ interface TheaterSeatMapProps {
  * identical physical layout (only the individual seat cell — clickable vs.
  * admin-toggleable — differs, via the `renderSeat` render-prop).
  *
- * Renders the venue's two real sections top-to-bottom:
- *   1. Balcony  (Row 1: 4+4 seats; Rows 2-7: 8+8; Rows 8-9: 10+10)
- *   2. Main Floor (Rows 1-12: 12+12 seats each)
+ * Renders the venue's real layout top-to-bottom, matching the physical
+ * room (Stage/Screen at the front, Main Floor right in front of it,
+ * Balcony behind/further from the stage):
+ *   1. Main Floor (Rows 1-12, front to back: 12+12 seats each)
+ *   2. Balcony    (Rows 1-9, front [nearest Main Floor] to back:
+ *                  Rows 1-2: 10+10; Rows 3-8: 8+8; Row 9: 4+4)
  * Each row shows its Left seat block, a visible center-aisle gap, then its
  * Right seat block — mirroring the physical aisle that splits the venue.
+ * Section order simply follows `THEATER_LAYOUT` (see theaterLayout.ts), so
+ * changing that config's array order changes the rendered order too.
  */
 export default function TheaterSeatMap({ seats, renderSeat }: TheaterSeatMapProps) {
   const sections = buildTheaterSeatMap(seats)

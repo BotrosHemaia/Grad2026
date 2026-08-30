@@ -42,23 +42,25 @@ Two guests could theoretically click the same green seat at almost the same inst
 Firestore transactions use optimistic concurrency: if two clients' transactions race on the same document, Firestore automatically retries the loser against the fresh data, so the check-then-write logic above is never bypassed — whichever operation commits first wins, and the other is rejected with a clear error instead of corrupting state.
 
 ## Theater Seating Layout
-The seat map's physical structure is defined **once**, in `src/config/theaterLayout.json`, and consumed by both the seed script and the React app (via the typed wrapper `src/config/theaterLayout.ts`) so they can never drift out of sync. To change the venue's layout, edit only that JSON file, then re-run the seed script with `--reseed` (see below).
+The seat map's physical structure is defined **once**, in `src/config/theaterLayout.json`, and consumed by both the seed script and the React app (via the typed wrapper `src/config/theaterLayout.ts`) so they can never drift out of sync. To change the venue's layout (including section order), edit only that JSON file, then re-run the seed script with `--reseed` (see below).
 
-**Balcony** (144 seats):
-| Row(s) | Left seats | Aisle | Right seats |
-|---|---|---|---|
-| R1 | 4 | ✓ | 4 |
-| R2 – R7 (6 rows) | 8 | ✓ | 8 |
-| R8 – R9 (2 rows) | 10 | ✓ | 10 |
+Rendered top-to-bottom, matching the physical room: **Stage/Screen** at the very top, then **Main Floor** directly in front of it, then **Balcony** behind the Main Floor (farthest from the stage).
 
-**Main Floor** (288 seats):
+**Main Floor** (288 seats, rows numbered front-to-back):
 | Row(s) | Left seats | Aisle | Right seats |
 |---|---|---|---|
 | R1 – R12 (12 rows) | 12 | ✓ | 12 |
 
+**Balcony** (144 seats, R1 = closest to the Main Floor, counting back to R9 = last row):
+| Row(s) | Left seats | Aisle | Right seats |
+|---|---|---|---|
+| R1 – R2 (2 rows) | 10 | ✓ | 10 |
+| R3 – R8 (6 rows) | 8 | ✓ | 8 |
+| R9 (1 row) | 4 | ✓ | 4 |
+
 **Grand total: 432 seats.** Each seat's `seat_number` is generated as `` `${section}-R${row}-${side}-${seat_index}` ``, e.g. `Balcony-R1-Left-1`, `Main-R5-Right-12` — so admins and guests always know exactly where a seat physically is. The seat *button* itself displays only the short `seat_index` (e.g. `12`) since the full label wouldn't fit in a small grid cell; hover/tap the seat (or check the reservations table) to see its full label.
 
-Rendering: `src/components/TheaterSeatMap.tsx` is a shared component (used by both the guest `SeatGrid` and the admin `AdminSeatGrid` via a `renderSeat` render-prop) that walks this layout and renders each section with a title, each row with a row label, a Left seat block, a visible dashed-line **aisle gap**, and a Right seat block — so the guest and admin views are always structurally identical, and only the individual seat cell's clickability/tooltip differs.
+Rendering: `src/components/TheaterSeatMap.tsx` is a shared component (used by both the guest `SeatGrid` and the admin `AdminSeatGrid` via a `renderSeat` render-prop) that walks this layout (in `THEATER_LAYOUT` array order — Main Floor first, then Balcony) and renders each section with a title, each row with a row label, a Left seat block, a visible dashed-line **aisle gap**, and a Right seat block — so the guest and admin views are always structurally identical, and only the individual seat cell's clickability/tooltip differs.
 
 ## Data Architecture
 

@@ -26,7 +26,14 @@
  * Console > Authentication > Users — this script does not create
  * accounts).
  *
- * To change the venue's seating chart, edit
+ * Physical layout (rendered top-to-bottom: Stage/Screen -> Main Floor ->
+ * Balcony, matching the venue's real room):
+ *   - Main Floor: Rows 1-12 (front to back), 12 seats left / 12 right.
+ *   - Balcony: Rows 1-9, numbered from the row closest to the Main Floor
+ *     back to the last row. Rows 1-2: 10 left / 10 right; Rows 3-8: 8
+ *     left / 8 right; Row 9: 4 left / 4 right.
+ *
+ * To change the venue's seating chart (or section order), edit
  * src/config/theaterLayout.json — this script and the React app both
  * read from it, so there is only one place to update.
  */
@@ -174,7 +181,7 @@ async function main() {
     await deleteAllDocs('seats')
   }
 
-  console.log(`Seeding ${SEAT_DOCS.length} seats (Balcony: 144, Main Floor: 288)...`)
+  console.log(`Seeding ${SEAT_DOCS.length} seats (Main Floor: 288, Balcony: 144)...`)
   for (const seat of SEAT_DOCS) {
     await addDoc(seatsCol, seat)
   }

@@ -9,12 +9,16 @@ import type { Seat, SeatSide, TheaterSection } from '../types/models'
  * `fs.readFileSync` + `JSON.parse` without needing to run through Vite/TS).
  * This module wraps that JSON with typed helpers used by the React UI.
  *
- * Physical layout (per the venue's real seating chart):
- *   - Balcony: Row 1 has 4 seats left / 4 right; Rows 2-7 have 8 left / 8
- *     right; Rows 8-9 have 10 left / 10 right. Every row has a center
- *     aisle between its Left and Right blocks.
- *   - Main Floor: Rows 1-12 each have 12 seats left / 12 right, with a
- *     center aisle.
+ * Physical layout (per the venue's real seating chart), rendered top to
+ * bottom in this order — Stage/Screen, then Main Floor (closest to the
+ * stage), then Balcony (behind the Main Floor, farthest from the stage):
+ *   - Main Floor: Rows 1-12 (front to back) each have 12 seats left / 12
+ *     right, with a center aisle.
+ *   - Balcony: rows are numbered 1-9 starting from the row closest to the
+ *     Main Floor and counting back. Rows 1-2 have 10 seats left / 10
+ *     right; Rows 3-8 have 8 left / 8 right; Row 9 (the last/back row) has
+ *     4 left / 4 right. Every row has a center aisle between its Left and
+ *     Right blocks.
  *
  * Seat numbering: "<Section>-R<row>-<Side>-<index>", e.g.
  * "Balcony-R1-Left-1", "Main-R5-Right-12" — index 1 is always the seat
