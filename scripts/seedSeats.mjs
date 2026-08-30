@@ -12,7 +12,8 @@
  *                                          # reservations, then reseed from
  *                                          # scratch (use after changing the
  *                                          # layout config, e.g. this
- *                                          # Balcony/Main-Floor redesign)
+ *                                          # asymmetrical Balcony/Main-Floor
+ *                                          # blueprint overhaul)
  *
  * Requires the same VITE_FIREBASE_* values as the app, plus admin
  * credentials, read from .env.local in the project root (falls back to
@@ -26,14 +27,23 @@
  * Console > Authentication > Users — this script does not create
  * accounts).
  *
- * Physical layout (rendered top-to-bottom: Stage/Screen -> Main Floor ->
- * Balcony, matching the venue's real room):
- *   - Main Floor: Rows 1-12 (front to back), 12 seats left / 12 right.
- *   - Balcony: Rows 1-9, numbered from the row closest to the Main Floor
- *     back to the last row. Rows 1-2: 10 left / 10 right; Rows 3-8: 8
- *     left / 8 right; Row 9: 4 left / 4 right.
+ * Physical layout (rendered top-to-bottom in the UI: Balcony -> Main Floor
+ * -> Stage/Screen, matching the venue's real room). The venue's chart is
+ * **highly irregular** — every row is hard-mapped explicitly by letter
+ * label in theaterLayout.json (not derived from a repeating formula):
+ *   - Main Floor: 16 rows, "A".."P" (Left ends "L", Right ends "R").
+ *     Default 11 seats/side, with exceptions on both sides. Rows "OR"/"PR"
+ *     have no seats 1-3 (a red "Sound Control" box fills that space
+ *     instead) — their clickable seats start at number 4.
+ *   - Balcony: 11 letter rows "A".."K" (fully asymmetric per-row L/R
+ *     counts) plus three center structural elements: a "Control Room" box
+ *     (top), the standalone 3-seat "ML" row (middle, no aisle split), and
+ *     an "EXIT 4" box (further down).
+ * Purely decorative boxes (Sound Control / Control Room / EXIT 4) never
+ * produce seat documents — they only exist in the layout config for
+ * rendering.
  *
- * To change the venue's seating chart (or section order), edit
+ * To change the venue's seating chart (or section/row order), edit
  * src/config/theaterLayout.json — this script and the React app both
  * read from it, so there is only one place to update.
  */
@@ -96,27 +106,55 @@ if (!firebaseConfig.projectId) {
 const layoutPath = join(__dirname, '..', 'src', 'config', 'theaterLayout.json')
 const { sections } = JSON.parse(readFileSync(layoutPath, 'utf-8'))
 
+/**
+ * Build the canonical seat_number label. Mirrors
+ * src/config/theaterLayout.ts's buildSeatNumber() exactly — keep both in
+ * sync if this format ever changes. Side is abbreviated to a single
+ * letter (L/R); 'Center' rows (the Balcony's "ML") omit the side suffix.
+ */
 function buildSeatNumber(section, row, side, seatIndex) {
-  return `${section}-R${row}-${side}-${seatIndex}`
+  if (side === 'Center') return `${section}-${row}-${seatIndex}`
+  return `${section}-${row}${side === 'Left' ? 'L' : 'R'}-${seatIndex}`
 }
 
-/** Generate every seat document for the configured layout. */
+/**
+ * Generate every seat document for the configured layout. Mirrors
+ * src/config/theaterLayout.ts's generateSeatDefinitions() exactly.
+ */
 function generateSeatDocs() {
   const seats = []
   for (const section of sections) {
     for (const rowConfig of section.rows) {
-      const sides = [
-        { side: 'Left', count: rowConfig.leftCount },
-        { side: 'Right', count: rowConfig.rightCount },
-      ]
-      for (const { side, count } of sides) {
-        for (let i = 1; i <= count; i++) {
+      if (rowConfig.kind === 'centerRow') {
+        const start = rowConfig.startIndex ?? 1
+        for (let i = start; i < start + rowConfig.seatCount; i++) {
           seats.push({
-            seat_number: buildSeatNumber(section.id, rowConfig.row, side, i),
+            seat_number: buildSeatNumber(section.id, rowConfig.rowLabel, 'Center', i),
             status: 'Available',
             reservation_id: null,
             section: section.id,
-            row: rowConfig.row,
+            row: rowConfig.rowLabel,
+            side: 'Center',
+            seat_index: i,
+          })
+        }
+        continue
+      }
+
+      const leftStart = rowConfig.leftStartIndex ?? 1
+      const rightStart = rowConfig.rightStartIndex ?? 1
+      const sides = [
+        { side: 'Left', start: leftStart, count: rowConfig.leftCount },
+        { side: 'Right', start: rightStart, count: rowConfig.rightCount },
+      ]
+      for (const { side, start, count } of sides) {
+        for (let i = start; i < start + count; i++) {
+          seats.push({
+            seat_number: buildSeatNumber(section.id, rowConfig.rowLabel, side, i),
+            status: 'Available',
+            reservation_id: null,
+            section: section.id,
+            row: rowConfig.rowLabel,
             side,
             seat_index: i,
           })
@@ -181,7 +219,7 @@ async function main() {
     await deleteAllDocs('seats')
   }
 
-  console.log(`Seeding ${SEAT_DOCS.length} seats (Main Floor: 288, Balcony: 144)...`)
+  console.log(`Seeding ${SEAT_DOCS.length} seats (Main Floor + Balcony, new asymmetric blueprint)...`)
   for (const seat of SEAT_DOCS) {
     await addDoc(seatsCol, seat)
   }

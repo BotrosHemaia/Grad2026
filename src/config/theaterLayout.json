@@ -1,36 +1,43 @@
 {
   "sections": [
     {
-      "id": "Main",
-      "label": "Main Floor",
-      "rows": [
-        { "row": 1, "leftCount": 12, "rightCount": 12 },
-        { "row": 2, "leftCount": 12, "rightCount": 12 },
-        { "row": 3, "leftCount": 12, "rightCount": 12 },
-        { "row": 4, "leftCount": 12, "rightCount": 12 },
-        { "row": 5, "leftCount": 12, "rightCount": 12 },
-        { "row": 6, "leftCount": 12, "rightCount": 12 },
-        { "row": 7, "leftCount": 12, "rightCount": 12 },
-        { "row": 8, "leftCount": 12, "rightCount": 12 },
-        { "row": 9, "leftCount": 12, "rightCount": 12 },
-        { "row": 10, "leftCount": 12, "rightCount": 12 },
-        { "row": 11, "leftCount": 12, "rightCount": 12 },
-        { "row": 12, "leftCount": 12, "rightCount": 12 }
-      ]
-    },
-    {
       "id": "Balcony",
       "label": "Balcony",
       "rows": [
-        { "row": 1, "leftCount": 10, "rightCount": 10 },
-        { "row": 2, "leftCount": 10, "rightCount": 10 },
-        { "row": 3, "leftCount": 8, "rightCount": 8 },
-        { "row": 4, "leftCount": 8, "rightCount": 8 },
-        { "row": 5, "leftCount": 8, "rightCount": 8 },
-        { "row": 6, "leftCount": 8, "rightCount": 8 },
-        { "row": 7, "leftCount": 8, "rightCount": 8 },
-        { "row": 8, "leftCount": 8, "rightCount": 8 },
-        { "row": 9, "leftCount": 4, "rightCount": 4 }
+        { "kind": "row", "rowLabel": "K", "leftCount": 5, "rightCount": 5, "centerBox": { "id": "control-room", "label": "Control Room", "color": "navy" } },
+        { "kind": "row", "rowLabel": "J", "leftCount": 5, "rightCount": 4 },
+        { "kind": "row", "rowLabel": "I", "leftCount": 5, "rightCount": 5 },
+        { "kind": "row", "rowLabel": "H", "leftCount": 7, "rightCount": 7 },
+        { "kind": "row", "rowLabel": "G", "leftCount": 9, "rightCount": 9 },
+        { "kind": "centerRow", "rowLabel": "ML", "seatCount": 3 },
+        { "kind": "row", "rowLabel": "F", "leftCount": 8, "rightCount": 9, "centerBox": { "id": "exit-4", "label": "EXIT 4", "color": "green" } },
+        { "kind": "row", "rowLabel": "E", "leftCount": 8, "rightCount": 8 },
+        { "kind": "row", "rowLabel": "D", "leftCount": 7, "rightCount": 7 },
+        { "kind": "row", "rowLabel": "C", "leftCount": 7, "rightCount": 7 },
+        { "kind": "row", "rowLabel": "B", "leftCount": 12, "rightCount": 12 },
+        { "kind": "row", "rowLabel": "A", "leftCount": 11, "rightCount": 12 }
+      ]
+    },
+    {
+      "id": "Main",
+      "label": "Main Floor",
+      "rows": [
+        { "kind": "row", "rowLabel": "P", "leftCount": 11, "rightCount": 8, "rightStartIndex": 4, "rightBox": { "id": "sound-control-p", "label": "Sound Control", "color": "red", "span": 3 } },
+        { "kind": "row", "rowLabel": "O", "leftCount": 11, "rightCount": 8, "rightStartIndex": 4, "rightBox": { "id": "sound-control-o", "label": "Sound Control", "color": "red", "span": 3 } },
+        { "kind": "row", "rowLabel": "N", "leftCount": 10, "rightCount": 10 },
+        { "kind": "row", "rowLabel": "M", "leftCount": 9, "rightCount": 9 },
+        { "kind": "row", "rowLabel": "L", "leftCount": 11, "rightCount": 11 },
+        { "kind": "row", "rowLabel": "K", "leftCount": 11, "rightCount": 11 },
+        { "kind": "row", "rowLabel": "J", "leftCount": 11, "rightCount": 11 },
+        { "kind": "row", "rowLabel": "I", "leftCount": 10, "rightCount": 9 },
+        { "kind": "row", "rowLabel": "H", "leftCount": 11, "rightCount": 11 },
+        { "kind": "row", "rowLabel": "G", "leftCount": 11, "rightCount": 11 },
+        { "kind": "row", "rowLabel": "F", "leftCount": 11, "rightCount": 11 },
+        { "kind": "row", "rowLabel": "E", "leftCount": 10, "rightCount": 10 },
+        { "kind": "row", "rowLabel": "D", "leftCount": 10, "rightCount": 9 },
+        { "kind": "row", "rowLabel": "C", "leftCount": 11, "rightCount": 11 },
+        { "kind": "row", "rowLabel": "B", "leftCount": 11, "rightCount": 11 },
+        { "kind": "row", "rowLabel": "A", "leftCount": 11, "rightCount": 11 }
       ]
     }
   ]

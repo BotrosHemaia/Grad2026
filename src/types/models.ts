@@ -18,8 +18,11 @@ export type PaymentMethod = 'Cash' | 'InstaPay'
  */
 export type TheaterSection = 'Balcony' | 'Main'
 
-/** Which side of the center aisle a seat is on. */
-export type SeatSide = 'Left' | 'Right'
+/**
+ * Which side of the center aisle a seat is on. 'Center' is used only for
+ * the Balcony's special standalone "ML" row (3 seats, no aisle split).
+ */
+export type SeatSide = 'Left' | 'Right' | 'Center'
 
 /**
  * Firestore document shape for the `seats` collection.
@@ -47,9 +50,15 @@ export interface Seat {
   reservation_id?: string | null
   /** Theater section this seat belongs to (Balcony or Main Floor). */
   section: TheaterSection
-  /** 1-based row number *within its section* (each section restarts at row 1). */
-  row: number
-  /** Which side of the center aisle this seat is on. */
+  /**
+   * Letter-based row label *within its section*, matching the venue's real
+   * seating chart (e.g. "A".."P" for Main Floor, "A".."K" plus the special
+   * "ML" center row for Balcony). Not a number — rows are hard-mapped
+   * explicitly in `src/config/theaterLayout.json`, not derived from a
+   * pattern, because the venue's layout is highly irregular.
+   */
+  row: string
+  /** Which side of the center aisle this seat is on ('Center' for the Balcony's standalone "ML" row). */
   side: SeatSide
   /**
    * 1-based position within its row+side block, counted left-to-right

@@ -42,25 +42,42 @@ Two guests could theoretically click the same green seat at almost the same inst
 Firestore transactions use optimistic concurrency: if two clients' transactions race on the same document, Firestore automatically retries the loser against the fresh data, so the check-then-write logic above is never bypassed — whichever operation commits first wins, and the other is rejected with a clear error instead of corrupting state.
 
 ## Theater Seating Layout
-The seat map's physical structure is defined **once**, in `src/config/theaterLayout.json`, and consumed by both the seed script and the React app (via the typed wrapper `src/config/theaterLayout.ts`) so they can never drift out of sync. To change the venue's layout (including section order), edit only that JSON file, then re-run the seed script with `--reseed` (see below).
+The seat map's physical structure is defined **once**, in `src/config/theaterLayout.json`, and consumed by both the seed script and the React app (via the typed wrapper `src/config/theaterLayout.ts`) so they can never drift out of sync. The venue's real seating chart is **highly irregular**, so every row is **hard-mapped explicitly** (letter label + exact left/right counts + any exceptions) rather than derived from a repeating formula. To change the venue's layout, edit only that JSON file, then re-run the seed script with `--reseed` (see below) — this is destructive (wipes all seats **and** reservations), so only do it when there are no bookings you need to keep.
 
-Rendered top-to-bottom, matching the physical room: **Stage/Screen** at the very top, then **Main Floor** directly in front of it, then **Balcony** behind the Main Floor (farthest from the stage).
+Rendered top-to-bottom, matching the physical room: **Balcony** at the very top (farthest from the stage), then **Main Floor** directly above the stage, then **Stage/Screen** at the very bottom.
 
-**Main Floor** (288 seats, rows numbered front-to-back):
-| Row(s) | Left seats | Aisle | Right seats |
+**Main Floor** (332 seats) — 16 rows, letter labels **A to P** (Left rows end "L", Right rows end "R"). Default 11 seats/side, with these exceptions:
+| Row | Left | Right | Notes |
 |---|---|---|---|
-| R1 – R12 (12 rows) | 12 | ✓ | 12 |
+| A, B, C, F, G, H, J, K, L | 11 | 11 | default both sides |
+| D | 10 | 9 | |
+| E | 10 | 10 | |
+| I | 10 | 9 | |
+| M | 9 | 9 | |
+| N | 10 | 10 | |
+| O | 11 | 8 | Right seats start at **4** — seats 1-3 replaced by a red **"Sound Control"** box |
+| P | 11 | 8 | Right seats start at **4** — seats 1-3 replaced by a red **"Sound Control"** box |
 
-**Balcony** (144 seats, R1 = closest to the Main Floor, counting back to R9 = last row):
-| Row(s) | Left seats | Aisle | Right seats |
-|---|---|---|---|
-| R1 – R2 (2 rows) | 10 | ✓ | 10 |
-| R3 – R8 (6 rows) | 8 | ✓ | 8 |
-| R9 (1 row) | 4 | ✓ | 4 |
+**Balcony** (172 seats) — 11 rows, letter labels **A to K**, fully asymmetric per side, plus 3 center structural elements:
+| Row | Left | Right |
+|---|---|---|
+| A | 11 | 12 |
+| B | 12 | 12 |
+| C | 7 | 7 |
+| D | 7 | 7 |
+| E | 8 | 8 |
+| F | 8 | 9 |
+| G | 9 | 9 |
+| H | 7 | 7 |
+| I | 5 | 5 |
+| J | 5 | 4 |
+| K | 5 | 5 |
 
-**Grand total: 432 seats.** Each seat's `seat_number` is generated as `` `${section}-R${row}-${side}-${seat_index}` ``, e.g. `Balcony-R1-Left-1`, `Main-R5-Right-12` — so admins and guests always know exactly where a seat physically is. The seat *button* itself displays only the short `seat_index` (e.g. `12`) since the full label wouldn't fit in a small grid cell; hover/tap the seat (or check the reservations table) to see its full label.
+Balcony center elements (between the Left and Right blocks): a **"Control Room"** box at the top (row K), a standalone 3-seat **"ML"** row in the middle (no aisle split — `ML-1`, `ML-2`, `ML-3`), and an **"EXIT 4"** box further down (row F).
 
-Rendering: `src/components/TheaterSeatMap.tsx` is a shared component (used by both the guest `SeatGrid` and the admin `AdminSeatGrid` via a `renderSeat` render-prop) that walks this layout (in `THEATER_LAYOUT` array order — Main Floor first, then Balcony) and renders each section with a title, each row with a row label, a Left seat block, a visible dashed-line **aisle gap**, and a Right seat block — so the guest and admin views are always structurally identical, and only the individual seat cell's clickability/tooltip differs.
+**Grand total: 504 seats.** Each seat's `seat_number` is generated as `` `${section}-${row}${L|R}-${seat_index}` `` (e.g. `Balcony-AL-1`, `Main-PR-4`), or `` `${section}-${row}-${seat_index}` `` for the side-less Balcony "ML" row (e.g. `Balcony-ML-1`) — so admins and guests always know exactly where a seat physically is. The seat *button* itself displays only the short `seat_index` (e.g. `12`) since the full label wouldn't fit in a small grid cell; hover/tap the seat (or check the reservations table) to see its full label.
+
+Rendering: `src/components/TheaterSeatMap.tsx` is a shared component (used by both the guest `SeatGrid` and the admin `AdminSeatGrid` via a `renderSeat` render-prop) that renders **Balcony first, then Main Floor, then the Stage/Screen banner last** — so the guest and admin views are always structurally identical, and only the individual seat cell's clickability/tooltip differs. Each row shows its Left seat block, a visible aisle gap (which may instead show a decorative structural box like "Control Room"/"EXIT 4"), and its Right seat block; a row's own structural box (e.g. "Sound Control" on Main Floor's O/P rows) renders inline within that side's seat block, occupying the visual space of the missing seats.
 
 ## Visual Design — "University Graduation" Theme
 The UI uses a premium **Navy Blue + Gold + White/Light Gray** color palette to feel like a formal graduation invitation, implemented via a Tailwind CSS **CDN** build (no PostCSS pipeline):
@@ -137,7 +154,7 @@ webapp/
 │   ├── AdminApp.tsx                # Admin auth gate: renders AdminLoginPage or AdminDashboardPage
 │   ├── main.tsx                    # React root; simple path check routes "/admin" -> AdminApp, else -> App
 │   └── vite-env.d.ts               # typed import.meta.env for Firebase vars
-├── scripts/seedSeats.mjs           # bulk-creates the 432 seat documents from theaterLayout.json; supports --reseed
+├── scripts/seedSeats.mjs           # bulk-creates the 504 seat documents from theaterLayout.json; supports --reseed
 ├── firestore.rules                 # security rules: open reads, guest-scoped seat-lock/reservation-create, admin-only everything else
 ├── firestore.indexes.json          # composite indexes for status/seat_number and servant_name/created_at
 ├── firebase.json                   # Firebase CLI config (rules + indexes deploy target)
