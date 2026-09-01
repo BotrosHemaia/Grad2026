@@ -12,6 +12,9 @@ export type SeatStatus = 'Available' | 'Pending' | 'Confirmed' | 'Blocked'
 /** Accepted payment methods for a reservation. */
 export type PaymentMethod = 'Cash' | 'InstaPay'
 
+/** Lifecycle status stored on reservation documents. */
+export type ReservationStatus = 'Pending' | 'Confirmed' | 'Canceled'
+
 /**
  * Physical theater section a seat belongs to. Matches the venue's real
  * layout: an elevated Balcony section and the ground-level Main Floor.
@@ -48,6 +51,8 @@ export interface Seat {
    * service layer; not required by the schema but simplifies lookups.
    */
   reservation_id?: string | null
+  /** UID of the anonymous guest currently holding a Pending seat. */
+  held_by?: string | null
   /** Theater section this seat belongs to (Balcony or Main Floor). */
   section: TheaterSection
   /**
@@ -83,6 +88,12 @@ export interface Reservation {
   seat_ids: string[]
   /** Server-side timestamp of creation (Firestore Timestamp on read). */
   created_at: unknown
+  /** Stored explicitly so canceled reservations can be retained for reporting. */
+  status?: ReservationStatus
+  /** Firebase Auth UID that created the reservation (anonymous or admin). */
+  userId?: string
+  ticket_price?: number
+  total_price?: number
 }
 
 /** Shape accepted when creating a new reservation (no id / created_at yet). */

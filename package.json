@@ -11,6 +11,7 @@
     "deploy": "npm run build && wrangler pages deploy dist --project-name grad-party-seating",
     "lint": "tsc --noEmit",
     "seed:seats": "node scripts/seedSeats.mjs",
+    "auth:set-admin": "node scripts/setAdminClaim.mjs",
     "git:init": "git init && git add . && git commit -m 'Initial commit'",
     "git:commit": "git add . && git commit -m",
     "git:status": "git status",

@@ -24,3 +24,6 @@ export const SERVANT_NAMES: string[] = [
 
 /** Maximum number of seats a single guest may select/reserve at once. */
 export const MAX_SEATS_PER_BOOKING = 4
+
+/** Current ticket price per seat, in Egyptian pounds. */
+export const TICKET_PRICE_EGP = 70

@@ -13,12 +13,16 @@ import type { Reservation, Seat, SeatStatus } from '../types/models'
  * Cancelled reservations are deleted outright by cancelReservation(), so
  * there is no 'Cancelled' state to represent here.
  */
-export type DerivedReservationStatus = 'Pending' | 'Confirmed' | 'Unknown'
+export type DerivedReservationStatus = 'Pending' | 'Confirmed' | 'Canceled' | 'Unknown'
 
 export function getReservationStatus(
   reservation: Reservation,
   seatsById: Map<string, Seat>
 ): DerivedReservationStatus {
+  if (reservation.status === 'Canceled') return 'Canceled'
+  if (reservation.status === 'Confirmed') return 'Confirmed'
+  if (reservation.status === 'Pending') return 'Pending'
+
   const statuses: SeatStatus[] = reservation.seat_ids
     .map((id) => seatsById.get(id)?.status)
     .filter((s): s is SeatStatus => Boolean(s))

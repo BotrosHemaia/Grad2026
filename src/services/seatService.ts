@@ -16,6 +16,7 @@ import {
   orderBy,
   onSnapshot,
   runTransaction,
+  writeBatch,
   type Unsubscribe,
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
@@ -113,6 +114,22 @@ export async function unblockSeat(seatId: string): Promise<void> {
     }
     tx.update(ref, { status: 'Available' })
   })
+}
+
+/** Atomically block or unblock a list of seat document IDs for VIP use. */
+export async function setVipSeatBlocking(seatIds: string[], blocked: boolean): Promise<void> {
+  const uniqueIds = [...new Set(seatIds)]
+  if (uniqueIds.length === 0) throw new Error('Enter at least one valid seat.')
+  if (uniqueIds.length > 500) throw new Error('A maximum of 500 seats can be changed at once.')
+
+  const batch = writeBatch(db)
+  uniqueIds.forEach((seatId) => {
+    batch.update(doc(db, COLLECTIONS.SEATS, seatId), {
+      status: blocked ? 'Blocked' : 'Available',
+      ...(blocked ? {} : { reservation_id: null }),
+    })
+  })
+  await batch.commit()
 }
 
 /**

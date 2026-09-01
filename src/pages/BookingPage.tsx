@@ -86,11 +86,9 @@ export default function BookingPage({ onBack }: BookingPageProps) {
     setSubmitting(true)
     setSubmitError(null)
     try {
-      // This call performs the atomic Firestore transaction: it re-checks
-      // every selected seat is still 'Available' and flips them all to
-      // 'Pending' together with creating the reservation document. If any
-      // seat was grabbed by another guest in the meantime, the whole
-      // operation is rejected and nothing is written.
+      // The anonymous Firebase user performs one atomic client transaction.
+      // Firestore Rules validate the reservation and every linked seat in
+      // their projected post-transaction state before allowing the commit.
       await createReservation({
         guest_name: values.guest_name,
         phone_number: values.phone_number,
@@ -107,7 +105,7 @@ export default function BookingPage({ onBack }: BookingPageProps) {
           ? err.message
           : 'Something went wrong while reserving your seats. Please try again.'
       setSubmitError(
-        message.includes('not available')
+        message.includes('not available') || message.includes('just taken')
           ? 'One or more selected seats were just taken by someone else. Please pick different seats.'
           : message
       )
@@ -150,7 +148,7 @@ export default function BookingPage({ onBack }: BookingPageProps) {
   }
 
   return (
-    <div id="booking-page" className="max-w-6xl mx-auto px-4 py-6 sm:py-8 space-y-6">
+    <div id="booking-page" className="w-full max-w-[1500px] mx-auto px-4 py-6 sm:py-8 space-y-6">
       <div className="flex items-center gap-3">
         <button
           type="button"

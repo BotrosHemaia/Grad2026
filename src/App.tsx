@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { onAuthStateChanged, signInAnonymously } from 'firebase/auth'
 import WelcomePage from './pages/WelcomePage'
 import BookingPage from './pages/BookingPage'
+import { auth } from './firebase/config'
 
 type View = 'welcome' | 'booking'
 
@@ -13,6 +15,25 @@ type View = 'welcome' | 'booking'
  */
 function App() {
   const [view, setView] = useState<View>('welcome')
+  const [guestAuthError, setGuestAuthError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let signingIn = false
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user || signingIn) return
+      signingIn = true
+      try {
+        await signInAnonymously(auth)
+        setGuestAuthError(null)
+      } catch (error) {
+        console.error('Anonymous sign-in failed:', error)
+        setGuestAuthError('Booking is temporarily unavailable. Please refresh and try again.')
+      } finally {
+        signingIn = false
+      }
+    })
+    return unsubscribe
+  }, [])
 
   return (
     <div id="app-root" className="min-h-screen bg-gray-50 flex flex-col">
@@ -28,6 +49,11 @@ function App() {
       </header>
 
       <main id="app-main" className="flex-1">
+        {guestAuthError && (
+          <p className="mx-auto mt-4 max-w-xl rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
+            {guestAuthError}
+          </p>
+        )}
         {view === 'welcome' && <WelcomePage onBookNow={() => setView('booking')} />}
         {view === 'booking' && <BookingPage onBack={() => setView('welcome')} />}
       </main>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { User } from 'firebase/auth'
+import { getIdTokenResult, type User } from 'firebase/auth'
 import { subscribeToAuthState } from './services/authService'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
@@ -15,9 +15,21 @@ export default function AdminApp() {
   const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
-    const unsubscribe = subscribeToAuthState((u) => {
-      setUser(u)
-      setAuthChecked(true)
+    const unsubscribe = subscribeToAuthState(async (u) => {
+      if (!u || u.isAnonymous) {
+        setUser(null)
+        setAuthChecked(true)
+        return
+      }
+
+      try {
+        const token = await getIdTokenResult(u)
+        setUser(token.claims.admin === true ? u : null)
+      } catch {
+        setUser(null)
+      } finally {
+        setAuthChecked(true)
+      }
     })
     return () => unsubscribe()
   }, [])

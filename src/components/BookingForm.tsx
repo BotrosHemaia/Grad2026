@@ -1,6 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import type { PaymentMethod } from '../types/models'
-import { SERVANT_NAMES, MAX_SEATS_PER_BOOKING } from '../config/eventConfig'
+import {
+  SERVANT_NAMES,
+  MAX_SEATS_PER_BOOKING,
+  TICKET_PRICE_EGP,
+} from '../config/eventConfig'
 
 export interface BookingFormValues {
   guest_name: string
@@ -42,6 +46,7 @@ export default function BookingForm({
   const [validationError, setValidationError] = useState<string | null>(null)
 
   const hasSeats = selectedSeatNumbers.length > 0
+  const totalAmount = selectedSeatNumbers.length * TICKET_PRICE_EGP
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -166,6 +171,17 @@ export default function BookingForm({
             </option>
           ))}
         </select>
+      </div>
+
+      <div
+        id="order-total"
+        className="flex items-center justify-between rounded-xl border border-gold-300 bg-gold-50 px-4 py-3 text-navy-900"
+        aria-live="polite"
+      >
+        <span className="text-sm font-semibold">Total Amount</span>
+        <strong className="text-lg font-bold text-navy-900">
+          Total: {totalAmount} EGP
+        </strong>
       </div>
 
       <p id="payment-disclaimer" className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5">

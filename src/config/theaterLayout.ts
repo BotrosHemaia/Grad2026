@@ -15,13 +15,12 @@ import type { Seat, SeatSide, TheaterSection } from '../types/models'
  * repeating pattern/formula. See that file for the literal per-row data;
  * this module only provides types + small generic helpers that walk it.
  *
- * Rendered top-to-bottom, matching the physical room:
- *   1. Balcony    (farthest from the stage, rendered at the very top)
- *   2. Main Floor (directly above the stage)
- *   3. Stage / Screen (rendered at the very bottom)
- * Section order in this config always follows that: Balcony first, then
- * Main. (The Stage/Screen banner itself is not part of this config — it's
- * a fixed decorative element rendered by TheaterSeatMap.tsx.)
+ * Rendered top-to-bottom to match the supplied wireframes:
+ *   1. Stage
+ *   2. Main Floor, rows A through P
+ *   3. Balcony, rows A through K
+ * The Stage banner is a fixed structural element rendered by
+ * TheaterSeatMap.tsx; everything else comes from this configuration.
  *
  * A section's `rows` array is a mix of three row "kinds":
  *   - `"row"`: a normal Left/Right paired row (e.g. Main Floor's "A".."P",
@@ -55,6 +54,8 @@ export interface TheaterBoxConfig {
   color: 'red' | 'navy' | 'green'
   /** How many seat-widths of visual space the box should span (defaults to 1). */
   span?: number
+  /** How many theater rows the box occupies vertically (defaults to 1). */
+  rowSpan?: number
 }
 
 /** A normal Left/Right paired row. */
