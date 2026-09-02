@@ -29,8 +29,8 @@ export type SeatSide = 'Left' | 'Right' | 'Center'
 
 /**
  * Firestore document shape for the `seats` collection.
- * Document ID (Firestore auto-id or custom, e.g. "A1") is stored separately
- * as `id` when read back from the DB via the service layer.
+ * Document ID is the deterministic `seat_number` (for example,
+ * "Balcony-AR-1") and is also exposed as `id` by the service layer.
  */
 export interface Seat {
   /** Firestore document ID. Optional on create, always present on read. */

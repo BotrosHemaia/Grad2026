@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FirebaseError } from 'firebase/app'
 import type { Seat } from '../types/models'
-import { getAllSeats } from '../services/seatService'
+import { subscribeToSeats } from '../services/seatService'
 import { createReservation } from '../services/reservationService'
 import SeatGrid from '../components/SeatGrid'
 import SeatLegend from '../components/SeatLegend'
@@ -13,9 +13,9 @@ interface BookingPageProps {
 }
 
 /**
- * Guest booking flow using a one-time seat fetch instead of a full-collection
- * realtime listener. The reservation transaction still re-reads selected
- * seats before committing, so double-booking protection remains intact.
+ * Guest booking flow with an optimized realtime listener. The physical layout
+ * is generated locally; Firestore sends only unavailable seat documents.
+ * The reservation transaction still re-reads selected seats before committing.
  */
 export default function BookingPage({ onBack }: BookingPageProps) {
   const [seats, setSeats] = useState<Seat[]>([])
@@ -28,35 +28,32 @@ export default function BookingPage({ onBack }: BookingPageProps) {
   const [successInfo, setSuccessInfo] = useState<{ seatNumbers: string[] } | null>(null)
 
   useEffect(() => {
-    let active = true
-
-    async function loadSeats() {
-      try {
-        const data = await getAllSeats()
-        if (!active) return
-
+    const unsubscribe = subscribeToSeats(
+      (data) => {
         setSeats(data)
         setConnectionError(null)
-      } catch (error) {
+        setLoading(false)
+      },
+      (error) => {
         console.error('Failed to load seats:', error)
-        if (!active) return
-
         setConnectionError(
           error instanceof FirebaseError && error.code === 'resource-exhausted'
             ? 'The seat map has reached its temporary usage limit. Please try again later.'
             : 'Could not load the seat map. Please check your connection and try again.'
         )
-      } finally {
-        if (active) setLoading(false)
+        setLoading(false)
       }
-    }
+    )
 
-    void loadSeats()
-
-    return () => {
-      active = false
-    }
+    return unsubscribe
   }, [])
+
+  // A realtime update can make a selected seat unavailable before submit.
+  useEffect(() => {
+    setSelectedSeatIds((previous) =>
+      previous.filter((id) => seats.find((seat) => seat.id === id)?.status === 'Available')
+    )
+  }, [seats])
 
   const selectedSeatNumbers = useMemo(
     () =>

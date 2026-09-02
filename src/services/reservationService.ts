@@ -15,6 +15,7 @@ import {
   deleteDoc,
   updateDoc,
   query,
+  where,
   orderBy,
   onSnapshot,
   runTransaction,
@@ -196,7 +197,12 @@ export async function resetAllTestReservationData(): Promise<{
 }> {
   const [reservationSnapshot, seatSnapshot] = await Promise.all([
     getDocs(reservationsCol),
-    getDocs(collection(db, COLLECTIONS.SEATS)),
+    getDocs(
+      query(
+        collection(db, COLLECTIONS.SEATS),
+        where('status', 'in', ['Pending', 'Confirmed'])
+      )
+    ),
   ])
 
   type ResetOperation = (batch: WriteBatch) => void
@@ -206,9 +212,7 @@ export async function resetAllTestReservationData(): Promise<{
     operations.push((batch) => batch.delete(reservationDoc.ref))
   })
 
-  const releasableStatuses = new Set(['Pending', 'Confirmed', 'Canceled'])
   const seatsToRelease: DocumentReference[] = seatSnapshot.docs
-    .filter((seatDoc) => releasableStatuses.has(String(seatDoc.data().status)))
     .map((seatDoc) => seatDoc.ref)
 
   seatsToRelease.forEach((seatRef) => {

@@ -54,7 +54,7 @@ import { initializeApp } from 'firebase/app'
 import {
   getFirestore,
   collection,
-  addDoc,
+  setDoc,
   getDocs,
   deleteDoc,
   doc,
@@ -219,9 +219,9 @@ async function main() {
     await deleteAllDocs('seats')
   }
 
-  console.log(`Seeding ${SEAT_DOCS.length} seats (Main Floor + Balcony, new asymmetric blueprint)...`)
+  console.log(`Seeding ${SEAT_DOCS.length} seats with deterministic seat_number document IDs...`)
   for (const seat of SEAT_DOCS) {
-    await addDoc(seatsCol, seat)
+    await setDoc(doc(db, 'seats', seat.seat_number), seat)
   }
   console.log('Done.')
 }
