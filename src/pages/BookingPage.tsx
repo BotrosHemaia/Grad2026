@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
+import { FirebaseError } from 'firebase/app'
 import type { Seat } from '../types/models'
-import { subscribeToSeats } from '../services/seatService'
+import { getAllSeats } from '../services/seatService'
 import { createReservation } from '../services/reservationService'
 import SeatGrid from '../components/SeatGrid'
 import SeatLegend from '../components/SeatLegend'
@@ -12,14 +13,9 @@ interface BookingPageProps {
 }
 
 /**
- * Guest booking flow: live seat grid + booking form.
- *
- * Race-condition safety: the actual Firestore write happens inside
- * `createReservation`, which runs a `runTransaction` that re-reads each
- * selected seat's current status and aborts the whole write if any seat
- * was already taken by someone else between the guest clicking it and
- * submitting the form. This guarantees two guests can never be
- * simultaneously confirmed into the same seat.
+ * Guest booking flow using a one-time seat fetch instead of a full-collection
+ * realtime listener. The reservation transaction still re-reads selected
+ * seats before committing, so double-booking protection remains intact.
  */
 export default function BookingPage({ onBack }: BookingPageProps) {
   const [seats, setSeats] = useState<Seat[]>([])
@@ -32,37 +28,41 @@ export default function BookingPage({ onBack }: BookingPageProps) {
   const [successInfo, setSuccessInfo] = useState<{ seatNumbers: string[] } | null>(null)
 
   useEffect(() => {
-    const unsubscribe = subscribeToSeats(
-      (data) => {
-        setSeats(data)
-        setLoading(false)
-      },
-      (error) => {
-        console.error('Failed to subscribe to seats:', error)
-        setConnectionError('Could not load the seat map. Please check your connection and try again.')
-        setLoading(false)
-      }
-    )
-    return () => unsubscribe()
-  }, [])
+    let active = true
 
-  // If a seat the guest had selected changes status underneath them
-  // (e.g. someone else grabs it first), drop it from the selection so the
-  // UI never shows a stale/impossible pick.
-  useEffect(() => {
-    setSelectedSeatIds((prev) =>
-      prev.filter((id) => {
-        const seat = seats.find((s) => s.id === id)
-        return seat && seat.status === 'Available'
-      })
-    )
-  }, [seats])
+    async function loadSeats() {
+      try {
+        const data = await getAllSeats()
+        if (!active) return
+
+        setSeats(data)
+        setConnectionError(null)
+      } catch (error) {
+        console.error('Failed to load seats:', error)
+        if (!active) return
+
+        setConnectionError(
+          error instanceof FirebaseError && error.code === 'resource-exhausted'
+            ? 'The seat map has reached its temporary usage limit. Please try again later.'
+            : 'Could not load the seat map. Please check your connection and try again.'
+        )
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+
+    void loadSeats()
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   const selectedSeatNumbers = useMemo(
     () =>
       selectedSeatIds
-        .map((id) => seats.find((s) => s.id === id)?.seat_number)
-        .filter((n): n is string => Boolean(n)),
+        .map((id) => seats.find((seat) => seat.id === id)?.seat_number)
+        .filter((seatNumber): seatNumber is string => Boolean(seatNumber)),
     [selectedSeatIds, seats]
   )
 
@@ -70,25 +70,25 @@ export default function BookingPage({ onBack }: BookingPageProps) {
     if (!seat.id || seat.status !== 'Available') return
     setSubmitError(null)
 
-    setSelectedSeatIds((prev) => {
-      if (prev.includes(seat.id!)) {
-        return prev.filter((id) => id !== seat.id)
+    setSelectedSeatIds((previous) => {
+      if (previous.includes(seat.id!)) {
+        return previous.filter((id) => id !== seat.id)
       }
-      if (prev.length >= MAX_SEATS_PER_BOOKING) {
+
+      if (previous.length >= MAX_SEATS_PER_BOOKING) {
         setSubmitError(`You can only select up to ${MAX_SEATS_PER_BOOKING} seats.`)
-        return prev
+        return previous
       }
-      return [...prev, seat.id!]
+
+      return [...previous, seat.id!]
     })
   }
 
   const handleSubmit = async (values: BookingFormValues) => {
     setSubmitting(true)
     setSubmitError(null)
+
     try {
-      // The anonymous Firebase user performs one atomic client transaction.
-      // Firestore Rules validate the reservation and every linked seat in
-      // their projected post-transaction state before allowing the commit.
       await createReservation({
         guest_name: values.guest_name,
         phone_number: values.phone_number,
@@ -96,19 +96,38 @@ export default function BookingPage({ onBack }: BookingPageProps) {
         servant_name: values.servant_name,
         seat_ids: selectedSeatIds,
       })
+
       setSuccessInfo({ seatNumbers: selectedSeatNumbers })
       setSelectedSeatIds([])
-    } catch (err) {
-      console.error('Failed to create reservation:', err)
-      const message =
-        err instanceof Error
-          ? err.message
-          : 'Something went wrong while reserving your seats. Please try again.'
-      setSubmitError(
-        message.includes('not available') || message.includes('just taken')
-          ? 'One or more selected seats were just taken by someone else. Please pick different seats.'
-          : message
-      )
+    } catch (error) {
+      console.error('Failed to create reservation:', error)
+
+      if (error instanceof FirebaseError) {
+        if (error.code === 'resource-exhausted') {
+          setSubmitError(
+            'The reservation system has reached its temporary usage limit. Please try again later.'
+          )
+        } else if (error.code === 'auth/quota-exceeded') {
+          setSubmitError(
+            'Too many new guest sessions were created from this network. Please wait and try again without incognito mode.'
+          )
+        } else if (error.code === 'permission-denied') {
+          setSubmitError('Your session cannot complete this reservation. Please refresh and try again.')
+        } else {
+          setSubmitError('Could not complete the reservation. Please refresh and try again.')
+        }
+      } else {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Something went wrong while reserving your seats. Please try again.'
+
+        setSubmitError(
+          message.includes('not available') || message.includes('just taken')
+            ? 'One or more selected seats were just taken by someone else. Please pick different seats.'
+            : message
+        )
+      }
     } finally {
       setSubmitting(false)
     }
@@ -171,7 +190,7 @@ export default function BookingPage({ onBack }: BookingPageProps) {
           <i className="fas fa-circle-notch fa-spin mr-2" aria-hidden="true"></i>
           Loading seat map…
         </p>
-      ) : (
+      ) : seats.length > 0 ? (
         <>
           <div className="bg-white rounded-2xl shadow-md ring-1 ring-gray-100 p-3">
             <SeatLegend />
@@ -192,7 +211,7 @@ export default function BookingPage({ onBack }: BookingPageProps) {
             onSubmit={handleSubmit}
           />
         </>
-      )}
+      ) : null}
     </div>
   )
 }
