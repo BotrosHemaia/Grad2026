@@ -1,8 +1,22 @@
-import { cert, getApps, initializeApp } from 'firebase-admin/app'
-import { getAuth } from 'firebase-admin/auth'
-import { FieldValue, getFirestore } from 'firebase-admin/firestore'
+let adminModulesPromise
 
-function getAdminApp() {
+function loadFirebaseAdmin() {
+  if (!adminModulesPromise) {
+    adminModulesPromise = Promise.all([
+      import('firebase-admin/app'),
+      import('firebase-admin/auth'),
+      import('firebase-admin/firestore'),
+    ]).then(([appModule, authModule, firestoreModule]) => ({
+      ...appModule,
+      ...authModule,
+      ...firestoreModule,
+    }))
+  }
+  return adminModulesPromise
+}
+
+async function getAdminApp() {
+  const { cert, getApps, initializeApp } = await loadFirebaseAdmin()
   if (getApps().length) return getApps()[0]
 
   const projectId = process.env.FIREBASE_PROJECT_ID
@@ -70,7 +84,8 @@ export default async function handler(request, response) {
 
   let notificationRef
   try {
-    const adminApp = getAdminApp()
+    const { FieldValue, getAuth, getFirestore } = await loadFirebaseAdmin()
+    const adminApp = await getAdminApp()
     const decodedToken = await getAuth(adminApp).verifyIdToken(token)
     const firestore = getFirestore(adminApp)
     const reservationRef = firestore.collection('reservations').doc(reservationId)
