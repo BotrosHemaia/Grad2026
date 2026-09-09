@@ -1,0 +1,96 @@
+.booking-shell { min-height:100%; background:#082039; padding:22px; color:#0a2540; }
+.booking-frame { max-width:1500px; margin:0 auto; overflow:hidden; border-radius:18px; background:#fbfaf6; box-shadow:0 28px 70px #020b1680; }
+.booking-nav { min-height:82px; padding:18px 3.5%; border-bottom:1px solid #d9d5cc; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.booking-logo { display:flex; align-items:center; gap:12px; border:0; background:none; color:#0a2540; font-family:'Playfair Display',Georgia,serif; font-size:1.65rem; cursor:pointer; }
+.booking-logo i { color:#0a2540; }
+.booking-nav > span { max-width:160px; color:#8b6a2d; font-family:'Playfair Display',Georgia,serif; font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; line-height:1.5; text-align:right; }
+.booking-topline { padding:24px 3.5% 20px; display:grid; grid-template-columns:minmax(300px,1fr) minmax(480px,.9fr); align-items:end; gap:32px; }
+.booking-topline h1,.details-heading h2,.selection-card h2,.details-summary h2,.confirmation-card h2 { margin:8px 0 3px; color:#0a2540; font-family:'Playfair Display',Georgia,serif; font-weight:500; }
+.booking-topline h1 { font-size:clamp(2rem,3.2vw,3rem); line-height:1.1; }
+.booking-topline p,.details-heading > p:last-child { margin:0; color:#5f6872; }
+.flow-back { padding:7px 0; border:0; background:none; color:#233a50; font:inherit; cursor:pointer; }
+.flow-progress { display:grid; grid-template-columns:repeat(3,1fr); margin:0; padding:0; list-style:none; }
+.flow-progress li { position:relative; display:grid; justify-items:center; gap:6px; color:#8a9199; font-family:'Playfair Display',Georgia,serif; font-size:.9rem; }
+.flow-progress li::before { content:''; position:absolute; top:17px; right:50%; width:100%; height:1px; background:#c8c9c9; z-index:0; }
+.flow-progress li:first-child::before { display:none; }
+.flow-progress li span { position:relative; z-index:1; width:36px; height:36px; display:grid; place-items:center; border:1px solid #aeb6bd; border-radius:50%; background:#fbfaf6; color:#0a2540; }
+.flow-progress li strong { font-weight:500; }
+.flow-progress li.active { color:#0a2540; }
+.flow-progress li.active span { border-color:#c59b51; background:#c59b51; color:white; }
+.seat-selection-layout { padding:0 2% 28px; display:grid; grid-template-columns:minmax(0,1fr) 355px; gap:22px; align-items:start; }
+.seat-map-card { min-width:0; padding:28px 18px 14px; border-radius:16px; background:white; box-shadow:0 8px 28px #0a254012; }
+.seat-map-card #seat-legend { margin-top:12px; border-top:1px solid #ece9e1; padding-top:20px; }
+.selection-card,.details-summary { border-radius:16px; background:linear-gradient(145deg,#0b2947,#071a2d); color:white; box-shadow:0 14px 34px #0a25402e; }
+.selection-card { position:sticky; top:20px; padding:32px 28px; }
+.flow-kicker { margin:0; color:#dcb76f; font-size:.72rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; }
+.selection-card h2,.details-summary h2 { color:white; font-size:2rem; }
+.summary-seat-list { display:flex; flex-wrap:wrap; gap:10px; margin:22px 0; min-height:38px; }
+.summary-seat-list span { display:inline-flex; min-height:40px; align-items:center; justify-content:center; padding:7px 14px; border:2px solid #d2ab63; border-radius:10px; color:inherit; font-weight:700; }
+.summary-seat-list p { margin:0; color:#b7c1cb; font-size:.9rem; }
+.selection-details { margin:18px 0 24px; padding:16px 0; border-top:1px solid #ffffff2e; border-bottom:1px solid #ffffff2e; display:grid; gap:17px; }
+.selection-detail { display:grid; grid-template-columns:28px 1fr; align-items:start; gap:12px; }
+.selection-detail i { color:#e0b967; font-size:1.15rem; padding-top:4px; }
+.selection-detail div { min-width:0; }
+.selection-detail span { display:block; color:#aebcca; font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; }
+.selection-detail strong { display:block; margin-top:3px; color:white; font-family:'Playfair Display',Georgia,serif; font-size:.98rem; font-weight:500; line-height:1.45; overflow-wrap:anywhere; }
+.flow-primary { width:100%; min-height:54px; padding:12px 22px; display:flex; justify-content:center; align-items:center; gap:20px; border:1px solid #e6c585; border-radius:9px; background:linear-gradient(120deg,#f0ca82,#cfa257); color:#081d31; font-family:'Playfair Display',Georgia,serif; font-size:1.12rem; font-weight:700; cursor:pointer; }
+.flow-primary:disabled { cursor:not-allowed; opacity:.45; filter:grayscale(.3); }
+.selection-card > small { display:block; margin-top:14px; color:#9eacba; text-align:center; }
+.selection-error,.flow-error { margin:14px 0; padding:11px 13px; border:1px solid #fecaca; border-radius:9px; background:#fef2f2; color:#b91c1c; font-size:.86rem; }
+.flow-loading { padding:100px 20px; color:#64748b; text-align:center; }
+.details-layout { padding:8px 5% 44px; display:grid; grid-template-columns:minmax(0,1.5fr) 350px; gap:24px; align-items:start; }
+.details-card { padding:34px; border-radius:16px; background:white; box-shadow:0 8px 28px #0a254012; }
+.details-heading h2 { font-size:2.25rem; }
+.ticket-names { margin:28px 0 22px; padding:0; border:0; }
+.ticket-names legend { margin-bottom:12px; color:#0a2540; font-family:'Playfair Display',Georgia,serif; font-size:1.2rem; font-weight:600; }
+.ticket-name-grid,.details-fields-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.flow-field { display:grid; align-content:start; gap:7px; color:#18344f; font-size:.88rem; font-weight:700; }
+.flow-field input,.flow-field select { width:100%; min-height:48px; padding:11px 13px; border:1px solid #cbd2d8; border-radius:9px; background:white; color:#0a2540; font:400 1rem Inter,system-ui,sans-serif; outline:none; }
+.flow-field input:focus,.flow-field select:focus { border-color:#c59b51; box-shadow:0 0 0 3px #e7c98f55; }
+.flow-field small { color:#7b858e; font-size:.72rem; font-weight:400; }
+.details-field-wide { grid-column:1/-1; }
+.details-card > .flow-primary { max-width:300px; margin:26px 0 0 auto; }
+.details-summary { position:sticky; top:20px; padding:30px 26px; }
+.summary-price-row,.summary-total { display:flex; justify-content:space-between; gap:16px; padding:16px 0; border-top:1px solid #ffffff2e; }
+.summary-price-row { color:#b8c3cd; font-size:.9rem; }
+.summary-price-row strong { color:white; }
+.summary-total { align-items:end; color:white; }
+.summary-total strong { color:#efc877; font-family:'Playfair Display',Georgia,serif; font-size:1.7rem; }
+.confirmation-card { max-width:720px; margin:10px auto 48px; padding:42px; border-radius:18px; background:white; box-shadow:0 14px 38px #0a25401f; text-align:center; }
+.confirmation-check { width:66px; height:66px; margin:0 auto 20px; display:grid; place-items:center; border-radius:50%; background:#dcfce7; color:#15803d; font-size:1.5rem; }
+.confirmation-card h2 { font-size:2.35rem; }
+.confirmation-grid { margin:28px 0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; text-align:left; }
+.confirmation-grid > div { padding:16px; border:1px solid #e2e5e8; border-radius:10px; background:#fbfaf6; }
+.confirmation-grid span { display:block; color:#7a838c; font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; }
+.confirmation-grid strong { display:block; margin-top:5px; color:#0a2540; font-family:'Playfair Display',Georgia,serif; font-size:1.1rem; }
+.confirmation-wide { grid-column:1/-1; }
+.payment-reminder { margin:24px 0; padding:16px; border:1px solid #f2c8c8; border-radius:10px; background:#fff5f5; color:#a52a2a; line-height:1.6; text-align:left; }
+.payment-reminder i { margin-right:8px; }
+.confirmation-card .flow-primary { max-width:300px; margin:0 auto; }
+.confirmation-home { margin-top:15px; }
+@media(max-width:1050px) {
+ .seat-selection-layout,.details-layout { grid-template-columns:1fr; }
+ .selection-card,.details-summary { position:static; }
+ .selection-card { display:grid; grid-template-columns:1fr 1fr; gap:12px 24px; }
+ .selection-card .flow-kicker,.selection-card h2,.selection-card .summary-seat-list,.selection-card .selection-error,.selection-card > small { grid-column:1/-1; }
+}
+@media(max-width:760px) {
+ .booking-shell { padding:0; }
+ .booking-frame { border-radius:0; }
+ .booking-nav { min-height:66px; padding:14px 18px; }
+ .booking-logo { font-size:1.2rem; }
+ .booking-nav > span { display:none; }
+ .booking-topline { grid-template-columns:1fr; padding:20px 18px; }
+ .flow-progress { order:-1; }
+ .flow-progress li strong { font-size:.72rem; }
+ .seat-selection-layout { padding:0 10px 24px; }
+ .seat-map-card { padding:18px 8px 10px; }
+ .selection-card { display:block; margin:0 8px; padding:26px 22px; }
+ .details-layout { padding:0 18px 32px; }
+ .details-card { padding:25px 20px; }
+ .ticket-name-grid,.details-fields-grid { grid-template-columns:1fr; }
+ .details-field-wide { grid-column:auto; }
+ .confirmation-card { margin:0 18px 34px; padding:30px 20px; }
+ .confirmation-grid { grid-template-columns:1fr; }
+ .confirmation-wide { grid-column:auto; }
+}

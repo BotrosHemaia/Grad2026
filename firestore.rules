@@ -99,6 +99,25 @@ service cloud.firestore {
         ));
     }
 
+    function validTicketNames(data) {
+      return data.ticket_names is list
+        && data.ticket_names.size() == data.seat_ids.size()
+        && data.ticket_names[0] is string
+        && data.ticket_names[0].size() >= 1 && data.ticket_names[0].size() <= 100
+        && (data.ticket_names.size() < 2 || (
+          data.ticket_names[1] is string
+          && data.ticket_names[1].size() >= 1 && data.ticket_names[1].size() <= 100
+        ))
+        && (data.ticket_names.size() < 3 || (
+          data.ticket_names[2] is string
+          && data.ticket_names[2].size() >= 1 && data.ticket_names[2].size() <= 100
+        ))
+        && (data.ticket_names.size() < 4 || (
+          data.ticket_names[3] is string
+          && data.ticket_names[3].size() >= 1 && data.ticket_names[3].size() <= 100
+        ));
+    }
+
     function allBookedSeatsMatch(data, reservationId) {
       return bookedSeatMatches(data, reservationId, 0)
         && (data.seat_ids.size() < 2 || bookedSeatMatches(data, reservationId, 1))
@@ -117,25 +136,26 @@ service cloud.firestore {
       let data = request.resource.data;
       return isAnonymousGuest()
         && data.keys().hasAll([
-          'guest_name', 'phone_number', 'payment_method', 'servant_name',
+          'guest_name', 'ticket_names', 'phone_number', 'payment_method', 'servant_name',
           'seat_ids', 'userId', 'status', 'ticket_price', 'total_price', 'created_at'
         ])
         && data.keys().hasOnly([
-          'guest_name', 'phone_number', 'payment_method', 'servant_name',
+          'guest_name', 'ticket_names', 'phone_number', 'payment_method', 'servant_name',
           'seat_ids', 'userId', 'status', 'ticket_price', 'total_price', 'created_at'
         ])
         && data.userId == request.auth.uid
         && data.guest_name is string
         && data.guest_name.size() >= 1 && data.guest_name.size() <= 100
         && data.phone_number is string
-        && data.phone_number.size() >= 7 && data.phone_number.size() <= 20
+        && data.phone_number.matches('^01[0125][0-9]{8}$')
         && (data.payment_method == 'Cash' || data.payment_method == 'InstaPay')
         && data.servant_name is string
         && data.servant_name.size() >= 1 && data.servant_name.size() <= 100
         && data.status == 'Pending'
         && validSeatList(data)
-        && data.ticket_price == 70
-        && data.total_price == data.seat_ids.size() * 70
+        && validTicketNames(data)
+        && data.ticket_price == 100
+        && data.total_price == data.seat_ids.size() * 100
         && data.created_at == request.time
         && allBookedSeatsMatch(data, reservationId);
     }

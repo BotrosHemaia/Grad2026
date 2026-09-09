@@ -38,18 +38,18 @@ function App() {
 
   return (
     <div id="app-root" className={`golden-app min-h-screen bg-gray-50 flex flex-col ${view === 'welcome' ? 'golden-home' : ''}`}>
-      <header id="app-header" className="golden-header">
+      {view === 'welcome' && <header id="app-header" className="golden-header">
         <div className="golden-header-inner">
           <button type="button" className="golden-brand" onClick={() => setView('welcome')} aria-label="Class of 2026 home">
             <i className="fas fa-graduation-cap" aria-hidden="true" />
             <span>Class of 2026</span>
           </button>
-          {view === 'welcome' && <nav className="golden-nav" aria-label="Event navigation">
+          <nav className="golden-nav" aria-label="Event navigation">
             <a href="#event-details">Event details</a>
             <button type="button" className="golden-button golden-button-small" onClick={() => setView('booking')}>Book Now <span aria-hidden="true">→</span></button>
-          </nav>}
+          </nav>
         </div>
-      </header>
+      </header>}
 
       <main id="app-main" className="flex-1">
         {guestAuthError && (

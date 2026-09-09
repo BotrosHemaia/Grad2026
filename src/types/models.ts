@@ -80,6 +80,8 @@ export interface Reservation {
   /** Firestore document ID. Optional on create, always present on read. */
   id?: string
   guest_name: string
+  /** One ticket-holder name for each seat, in the same order as seat_ids. */
+  ticket_names?: string[]
   phone_number: string
   payment_method: PaymentMethod
   /** Name of the servant/usher/staff member who registered the reservation. */
@@ -97,7 +99,9 @@ export interface Reservation {
 }
 
 /** Shape accepted when creating a new reservation (no id / created_at yet). */
-export type NewReservationInput = Omit<Reservation, 'id' | 'created_at'>
+export type NewReservationInput = Omit<Reservation, 'id' | 'created_at' | 'ticket_names'> & {
+  ticket_names: string[]
+}
 
 /** Shape accepted when creating a new seat (no id yet). */
 export type NewSeatInput = Omit<Seat, 'id'>

@@ -65,6 +65,9 @@ export async function createReservation(input: NewReservationInput): Promise<str
   if (new Set(input.seat_ids).size !== input.seat_ids.length) {
     throw new Error('Duplicate seats are not allowed.')
   }
+  if (input.ticket_names.length !== input.seat_ids.length) {
+    throw new Error('Enter one ticket-holder name for every selected seat.')
+  }
 
   const user = auth.currentUser ?? (await signInAnonymously(auth)).user
   const reservationRef = doc(reservationsCol)
@@ -83,6 +86,7 @@ export async function createReservation(input: NewReservationInput): Promise<str
 
     tx.set(reservationRef, {
       guest_name: input.guest_name.trim(),
+      ticket_names: input.ticket_names.map((name) => name.trim()),
       phone_number: input.phone_number.trim(),
       payment_method: input.payment_method,
       servant_name: input.servant_name,

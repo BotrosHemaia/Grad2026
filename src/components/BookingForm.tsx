@@ -1,13 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import type { PaymentMethod } from '../types/models'
-import {
-  SERVANT_NAMES,
-  MAX_SEATS_PER_BOOKING,
-  TICKET_PRICE_EGP,
-} from '../config/eventConfig'
+import { SERVANT_NAMES, TICKET_PRICE_EGP } from '../config/eventConfig'
 
 export interface BookingFormValues {
-  guest_name: string
+  ticket_names: string[]
   phone_number: string
   payment_method: PaymentMethod
   servant_name: string
@@ -17,199 +13,84 @@ interface BookingFormProps {
   selectedSeatNumbers: string[]
   submitting: boolean
   errorMessage: string | null
+  onBack: () => void
   onSubmit: (values: BookingFormValues) => void | Promise<void>
 }
 
-const PHONE_PATTERN = /^[0-9+\-\s]{7,20}$/
+const PHONE_PATTERN = /^01[0125][0-9]{8}$/
 
-const inputClasses =
-  'w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-navy-900 placeholder:text-gray-400 ' +
-  'focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 disabled:bg-gray-100 ' +
-  'transition-colors duration-150'
-
-/**
- * Booking form shown below the seat grid. Displays the currently selected
- * seat numbers and collects guest details required to create a
- * reservation. Validates required fields client-side before delegating
- * the actual (transactional) Firestore write to the parent's onSubmit.
- */
-export default function BookingForm({
-  selectedSeatNumbers,
-  submitting,
-  errorMessage,
-  onSubmit,
-}: BookingFormProps) {
-  const [guestName, setGuestName] = useState('')
+export default function BookingForm({ selectedSeatNumbers, submitting, errorMessage, onBack, onSubmit }: BookingFormProps) {
+  const [ticketNames, setTicketNames] = useState(() => selectedSeatNumbers.map(() => ''))
   const [phoneNumber, setPhoneNumber] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash')
   const [servantName, setServantName] = useState('')
   const [validationError, setValidationError] = useState<string | null>(null)
-
-  const hasSeats = selectedSeatNumbers.length > 0
   const totalAmount = selectedSeatNumbers.length * TICKET_PRICE_EGP
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
+  const updateTicketName = (index: number, value: string) => {
+    setTicketNames((previous) => previous.map((name, itemIndex) => itemIndex === index ? value : name))
+  }
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault()
     setValidationError(null)
-
-    if (selectedSeatNumbers.length === 0) {
-      setValidationError('Please select at least one seat on the map above.')
-      return
-    }
-    if (selectedSeatNumbers.length > MAX_SEATS_PER_BOOKING) {
-      setValidationError(`You can only reserve up to ${MAX_SEATS_PER_BOOKING} seats.`)
-      return
-    }
-    if (!guestName.trim()) {
-      setValidationError('Full name is required.')
-      return
-    }
-    if (!PHONE_PATTERN.test(phoneNumber.trim())) {
-      setValidationError('Please enter a valid phone number.')
-      return
-    }
-    if (!servantName) {
-      setValidationError('Please select a servant name.')
-      return
-    }
-
-    await onSubmit({
-      guest_name: guestName.trim(),
-      phone_number: phoneNumber.trim(),
-      payment_method: paymentMethod,
-      servant_name: servantName,
-    })
+    const names = ticketNames.map((name) => name.trim())
+    if (names.some((name) => !name)) return setValidationError('Enter a person name for every ticket.')
+    if (names.some((name) => name.length > 100)) return setValidationError('Ticket-holder names must be 100 characters or fewer.')
+    if (!PHONE_PATTERN.test(phoneNumber.trim())) return setValidationError('Enter an 11-digit mobile number starting with 010, 011, 012, or 015.')
+    if (!servantName) return setValidationError('Please select a servant name.')
+    await onSubmit({ ticket_names: names, phone_number: phoneNumber.trim(), payment_method: paymentMethod, servant_name: servantName })
   }
 
   return (
-    <form
-      id="booking-form"
-      onSubmit={handleSubmit}
-      className="max-w-md mx-auto bg-white rounded-2xl shadow-navy-lg ring-1 ring-gray-100 p-6 sm:p-7 space-y-5"
-    >
-      <div className="text-center">
-        <h3 className="font-display text-lg font-bold text-navy-900">Reservation Details</h3>
-        <p className="text-xs text-gray-400 mt-0.5">Fill in your information to confirm your seats</p>
-      </div>
+    <div className="details-layout">
+      <form id="booking-form" className="details-card" onSubmit={handleSubmit}>
+        <div className="details-heading">
+          <button type="button" className="flow-back" onClick={onBack}>← Back to seats</button>
+          <p className="flow-kicker">Ticket details</p>
+          <h2>Your details</h2>
+          <p>Add a name for each ticket, then tell us how to contact you.</p>
+        </div>
 
-      <div
-        id="selected-seats-summary"
-        className="rounded-xl bg-navy-900 p-4 relative overflow-hidden"
-      >
-        <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-gold-500 via-gold-300 to-gold-500"></div>
-        <p className="text-xs font-medium text-navy-100/70 uppercase tracking-wider">
-          Selected seats ({selectedSeatNumbers.length}/{MAX_SEATS_PER_BOOKING})
-        </p>
-        <p className="text-xl font-bold text-gold-400 mt-1 font-display">
-          {hasSeats ? selectedSeatNumbers.join(', ') : 'None selected yet'}
-        </p>
-      </div>
+        <fieldset className="ticket-names">
+          <legend>Names on tickets</legend>
+          <div className="ticket-name-grid">
+            {selectedSeatNumbers.map((seat, index) => (
+              <label key={seat} className="flow-field">
+                <span>Ticket {index + 1} · Seat {seat}</span>
+                <input type="text" value={ticketNames[index]} onChange={(event) => updateTicketName(index, event.target.value)} placeholder="Person's full name" autoComplete={index === 0 ? 'name' : 'off'} disabled={submitting} maxLength={100} />
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
-      <div>
-        <label htmlFor="guest-name-input" className="block text-sm font-medium text-navy-800 mb-1.5">
-          Full Name
-        </label>
-        <input
-          id="guest-name-input"
-          type="text"
-          value={guestName}
-          onChange={(e) => setGuestName(e.target.value)}
-          placeholder="e.g. Jane Doe"
-          disabled={submitting}
-          className={inputClasses}
-        />
-      </div>
+        <div className="details-fields-grid">
+          <label className="flow-field">
+            <span>Phone number</span>
+            <input id="phone-number-input" type="tel" inputMode="numeric" value={phoneNumber} onChange={(event) => setPhoneNumber(event.target.value.replace(/\D/g, '').slice(0, 11))} placeholder="01012345678" autoComplete="tel" disabled={submitting} pattern="01[0125][0-9]{8}" maxLength={11} />
+            <small>11 digits starting with 010, 011, 012, or 015</small>
+          </label>
+          <label className="flow-field">
+            <span>Payment method</span>
+            <select value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value as PaymentMethod)} disabled={submitting}><option value="Cash">Cash</option><option value="InstaPay">InstaPay</option></select>
+          </label>
+          <label className="flow-field details-field-wide">
+            <span>Servant name</span>
+            <select value={servantName} onChange={(event) => setServantName(event.target.value)} disabled={submitting}><option value="" disabled>Select the staff member helping you</option>{SERVANT_NAMES.map((name) => <option key={name} value={name}>{name}</option>)}</select>
+          </label>
+        </div>
 
-      <div>
-        <label htmlFor="phone-number-input" className="block text-sm font-medium text-navy-800 mb-1.5">
-          Phone Number
-        </label>
-        <input
-          id="phone-number-input"
-          type="tel"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          placeholder="e.g. 01012345678"
-          disabled={submitting}
-          className={inputClasses}
-        />
-      </div>
+        {(validationError || errorMessage) && <p className="flow-error" role="alert">{validationError || errorMessage}</p>}
+        <button type="submit" className="flow-primary" disabled={submitting}>{submitting ? 'Reserving…' : 'Confirm reservation'} <span aria-hidden="true">→</span></button>
+      </form>
 
-      <div>
-        <label htmlFor="payment-method-select" className="block text-sm font-medium text-navy-800 mb-1.5">
-          Payment Method
-        </label>
-        <select
-          id="payment-method-select"
-          value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-          disabled={submitting}
-          className={inputClasses}
-        >
-          <option value="Cash">Cash</option>
-          <option value="InstaPay">InstaPay</option>
-        </select>
-      </div>
-
-      <div>
-        <label htmlFor="servant-name-select" className="block text-sm font-medium text-navy-800 mb-1.5">
-          Servant Name
-        </label>
-        <select
-          id="servant-name-select"
-          value={servantName}
-          onChange={(e) => setServantName(e.target.value)}
-          disabled={submitting}
-          className={inputClasses}
-        >
-          <option value="" disabled>
-            Select the staff member helping you…
-          </option>
-          {SERVANT_NAMES.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div
-        id="order-total"
-        className="flex items-center justify-between rounded-xl border border-gold-300 bg-gold-50 px-4 py-3 text-navy-900"
-        aria-live="polite"
-      >
-        <span className="text-sm font-semibold">Total Amount</span>
-        <strong className="text-lg font-bold text-navy-900">
-          Total: {totalAmount} EGP
-        </strong>
-      </div>
-
-      <p id="payment-disclaimer" className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5">
-        <i className="fas fa-triangle-exclamation mr-1.5" aria-hidden="true"></i>
-        Payment must be completed within 1 hour to confirm reservation. Unpaid seats will be
-        released back to Available.
-      </p>
-
-      {(validationError || errorMessage) && (
-        <p id="booking-form-error" className="text-sm text-red-700 bg-red-100 rounded-lg p-2.5">
-          <i className="fas fa-circle-exclamation mr-1.5" aria-hidden="true"></i>
-          {validationError || errorMessage}
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={submitting || !hasSeats}
-        className="w-full rounded-lg bg-gold-500 hover:bg-gold-400 active:scale-[0.99] disabled:bg-gray-300 disabled:cursor-not-allowed text-navy-900 font-bold py-3 transition-all duration-150 shadow-gold-glow disabled:shadow-none"
-      >
-        {submitting ? (
-          <span className="inline-flex items-center gap-2">
-            <i className="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Reserving…
-          </span>
-        ) : (
-          `Reserve ${selectedSeatNumbers.length || ''} Seat${selectedSeatNumbers.length === 1 ? '' : 's'}`
-        )}
-      </button>
-    </form>
+      <aside className="details-summary" aria-label="Order summary">
+        <p className="flow-kicker">Order summary</p>
+        <h2>{selectedSeatNumbers.length} ticket{selectedSeatNumbers.length === 1 ? '' : 's'}</h2>
+        <div className="summary-seat-list">{selectedSeatNumbers.map((seat) => <span key={seat}>{seat}</span>)}</div>
+        <div className="summary-price-row"><span>{selectedSeatNumbers.length} × {TICKET_PRICE_EGP} EGP</span><strong>{totalAmount} EGP</strong></div>
+        <div className="summary-total"><span>Total amount</span><strong>{totalAmount} EGP</strong></div>
+      </aside>
+    </div>
   )
 }
