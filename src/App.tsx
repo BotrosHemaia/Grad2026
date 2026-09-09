@@ -3,6 +3,7 @@ import { onAuthStateChanged, signInAnonymously } from 'firebase/auth'
 import WelcomePage from './pages/WelcomePage'
 import BookingPage from './pages/BookingPage'
 import { auth } from './firebase/config'
+import './golden-evening.css'
 
 type View = 'welcome' | 'booking'
 
@@ -36,15 +37,17 @@ function App() {
   }, [])
 
   return (
-    <div id="app-root" className="min-h-screen bg-gray-50 flex flex-col">
-      <header id="app-header" className="bg-navy-900 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-center gap-2.5">
-          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gold-500/20 text-gold-400 text-sm ring-1 ring-gold-500/40">
-            <i className="fas fa-graduation-cap" aria-hidden="true"></i>
-          </span>
-          <h1 className="font-display text-base sm:text-lg font-semibold tracking-wide">
-            Class of 2026 <span className="text-gold-400">&middot;</span> Seat Reservation
-          </h1>
+    <div id="app-root" className={`golden-app min-h-screen bg-gray-50 flex flex-col ${view === 'welcome' ? 'golden-home' : ''}`}>
+      <header id="app-header" className="golden-header">
+        <div className="golden-header-inner">
+          <button type="button" className="golden-brand" onClick={() => setView('welcome')} aria-label="Class of 2026 home">
+            <i className="fas fa-graduation-cap" aria-hidden="true" />
+            <span>Class of 2026</span>
+          </button>
+          {view === 'welcome' && <nav className="golden-nav" aria-label="Event navigation">
+            <a href="#event-details">Event details</a>
+            <button type="button" className="golden-button golden-button-small" onClick={() => setView('booking')}>Book Now <span aria-hidden="true">→</span></button>
+          </nav>}
         </div>
       </header>
 
@@ -59,7 +62,7 @@ function App() {
       </main>
 
       <footer id="app-footer" className="text-center text-xs text-gray-400 py-6 border-t border-gray-200 bg-white">
-        <p>Secured by Firebase &middot; Graduation Party 2026</p>
+        <p>Graduation Party 2026</p>
         <a href="/admin" className="hover:text-navy-600 underline underline-offset-2 transition-colors">
           Admin Login
         </a>
