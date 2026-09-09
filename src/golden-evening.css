@@ -1,7 +1,7 @@
 .golden-app { --evening:#061626; --champagne:#edc57f; --ivory:#fff8e9; }
 .golden-app.golden-home { background:var(--evening); color:var(--ivory); }
 .golden-app .golden-header { background:var(--evening); color:var(--ivory); border-bottom:1px solid #edc57f40; }
-.golden-header-inner { max-width:1440px; margin:auto; padding:20px 5%; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.golden-header-inner { max-width:1440px; margin:auto; padding:14px 5%; display:flex; align-items:center; justify-content:space-between; gap:24px; }
 .golden-brand { display:flex; align-items:center; gap:14px; font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.1rem,2vw,1.6rem); background:none; border:0; color:var(--ivory); cursor:pointer; min-height:44px; }
 .golden-brand i { color:var(--champagne); font-size:1.8rem; }
 .golden-nav { display:flex; align-items:center; gap:36px; }
@@ -11,23 +11,23 @@
 .golden-button span { font-family:system-ui,sans-serif; }
 .golden-button-small { min-height:44px; padding:10px 22px; font-size:1rem; }
 .golden-app button:focus-visible,.golden-app a:focus-visible { outline:3px solid #edc57f; outline-offset:5px; }
-.golden-welcome { max-width:1440px; margin:0 auto; padding-bottom:36px; }
-.golden-hero { position:relative; isolation:isolate; min-height:720px; padding:52px 24px 310px; text-align:center; overflow:hidden; }
+.golden-welcome { max-width:1440px; margin:0 auto; padding-bottom:20px; }
+.golden-hero { position:relative; isolation:isolate; min-height:590px; padding:34px 24px 235px; text-align:center; overflow:hidden; }
 .golden-hero-image { position:absolute; inset:0; z-index:-2; width:100%; height:100%; object-fit:cover; object-position:center 65%; }
 .golden-hero::after { content:''; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,#0616268c 0%,#06162624 46%,transparent 65%,#061626 100%); }
 .golden-hero-copy { max-width:1000px; margin:auto; }
-.golden-eyebrow { display:flex; align-items:center; justify-content:center; gap:20px; color:var(--champagne); text-transform:uppercase; letter-spacing:.24em; font-size:.8rem; margin:0 0 24px; }
+.golden-eyebrow { display:flex; align-items:center; justify-content:center; gap:20px; color:var(--champagne); text-transform:uppercase; letter-spacing:.24em; font-size:.8rem; margin:0 0 18px; }
 .golden-eyebrow::before,.golden-eyebrow::after { content:''; width:46px; height:1px; background:var(--champagne); }
-.golden-hero h1 { font-family:'Playfair Display',Georgia,serif; font-size:clamp(2.8rem,5.6vw,5.3rem); line-height:1.08; font-weight:500; letter-spacing:-.035em; color:var(--ivory); max-width:960px; margin:0 auto; text-wrap:balance; }
-.golden-intro { margin:24px auto 28px; font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.05rem,2vw,1.5rem); line-height:1.6; color:var(--ivory); text-wrap:balance; }
-.golden-details-panel { position:relative; margin:-24px 4% 0; padding:32px 30px 22px; border:1px solid #d9b97c; border-radius:8px; background:#061626f5; }
+.golden-hero h1 { font-family:'Playfair Display',Georgia,serif; font-size:clamp(2.8rem,4.7vw,4.5rem); line-height:1.08; font-weight:500; letter-spacing:-.035em; color:var(--ivory); max-width:960px; margin:0 auto; text-wrap:balance; }
+.golden-intro { margin:18px auto 20px; font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.05rem,1.7vw,1.35rem); line-height:1.5; color:var(--ivory); text-wrap:balance; }
+.golden-details-panel { position:relative; margin:-20px 4% 0; padding:22px 26px 16px; border:1px solid #d9b97c; border-radius:8px; background:#061626f5; }
 .golden-details { display:grid; grid-template-columns:1.15fr 1fr 1.15fr; margin:0; }
-.golden-detail { display:flex; gap:20px; align-items:center; padding:0 24px; min-width:0; }
+.golden-detail { display:flex; gap:16px; align-items:center; padding:0 22px; min-width:0; }
 .golden-detail + .golden-detail { border-left:1px solid #edc57f55; }
-.golden-detail i { font-size:1.9rem; color:var(--champagne); }
-.golden-detail dt { text-transform:uppercase; letter-spacing:.18em; color:var(--champagne); font-size:.8rem; margin-bottom:8px; }
-.golden-detail dd { font-family:'Playfair Display',Georgia,serif; font-size:1.1rem; color:var(--ivory); margin:0; line-height:1.65; }
-.golden-keepsake { display:flex; align-items:center; gap:24px; margin:28px 0 0; color:#d8ccb8; font-size:.75rem; text-transform:uppercase; letter-spacing:.22em; text-align:center; }
+.golden-detail i { font-size:1.65rem; color:var(--champagne); }
+.golden-detail dt { text-transform:uppercase; letter-spacing:.18em; color:var(--champagne); font-size:.75rem; margin-bottom:5px; }
+.golden-detail dd { font-family:'Playfair Display',Georgia,serif; font-size:1rem; color:var(--ivory); margin:0; line-height:1.45; }
+.golden-keepsake { display:flex; align-items:center; gap:24px; margin:18px 0 0; color:#d8ccb8; font-size:.75rem; text-transform:uppercase; letter-spacing:.22em; text-align:center; }
 .golden-keepsake::before,.golden-keepsake::after { content:''; height:1px; background:#edc57f77; flex:1; }
 .golden-home #app-footer { background:var(--evening); border-color:#edc57f26; color:#beafa0; font-size:.8rem; }
 @media(max-width:800px) {
@@ -41,6 +41,12 @@
  .golden-details-panel { margin:-20px 5% 0; padding:26px; }
  .golden-detail dt { font-size:.75rem; margin-bottom:2px; }
  .golden-keepsake { line-height:1.8; letter-spacing:.14em; gap:12px; }
+}
+@media(min-width:801px) and (max-height:820px) {
+ .golden-hero { min-height:520px; padding-top:26px; padding-bottom:205px; }
+ .golden-header-inner { padding-top:10px; padding-bottom:10px; }
+ .golden-details-panel { padding-top:18px; padding-bottom:12px; }
+ .golden-keepsake { margin-top:12px; }
 }
 @media(max-width:420px) {
  .golden-brand { gap:8px; font-size:1.05rem; } .golden-brand i { font-size:1.45rem; }
