@@ -6,11 +6,11 @@ const { getFirestore, FieldValue } = require('firebase-admin/firestore')
 initializeApp()
 
 const db = getFirestore()
-const TICKET_PRICE_EGP = 100
+const TICKET_PRICE_EGP = 70
 const MAX_SEATS_PER_BOOKING = 4
 const ALLOWED_PAYMENT_METHODS = new Set(['Cash', 'InstaPay'])
 const ALLOWED_SERVANT_NAMES = new Set(['Mina Atta', 'Mina Adel', 'Marina', 'Aml'])
-const PHONE_PATTERN = /^01[0125][0-9]{8}$/
+const PHONE_PATTERN = /^[0-9+\-\s]{7,20}$/
 
 function requiredTrimmedString(value, fieldName, maxLength) {
   if (typeof value !== 'string') {
@@ -36,15 +36,10 @@ exports.createReservation = onCall(
   async (request) => {
     const data = request.data ?? {}
     const guestName = requiredTrimmedString(data.guestName, 'Guest name', 100)
-    const ticketNames = data.ticketNames
     const phoneNumber = requiredTrimmedString(data.phoneNumber, 'Phone number', 20)
     const servantName = requiredTrimmedString(data.servantName, 'Servant name', 100)
     const paymentMethod = data.paymentMethod
     const seatIds = data.seatIds
-
-    if (!Array.isArray(ticketNames) || !ticketNames.every((name) => typeof name === 'string')) {
-      throw new HttpsError('invalid-argument', 'Enter one ticket-holder name for every seat.')
-    }
 
     if (!PHONE_PATTERN.test(phoneNumber)) {
       throw new HttpsError('invalid-argument', 'Enter a valid phone number.')
@@ -67,12 +62,6 @@ exports.createReservation = onCall(
     if (new Set(seatIds).size !== seatIds.length) {
       throw new HttpsError('invalid-argument', 'Duplicate seat IDs are not allowed.')
     }
-    if (ticketNames.length !== seatIds.length) {
-      throw new HttpsError('invalid-argument', 'Enter one ticket-holder name for every seat.')
-    }
-    const normalizedTicketNames = ticketNames.map((name, index) =>
-      requiredTrimmedString(name, `Ticket ${index + 1} name`, 100)
-    )
 
     const reservationRef = db.collection('reservations').doc()
     const seatRefs = seatIds.map((seatId) => db.collection('seats').doc(seatId))
@@ -97,7 +86,6 @@ exports.createReservation = onCall(
 
         transaction.create(reservationRef, {
           guest_name: guestName,
-          ticket_names: normalizedTicketNames,
           phone_number: phoneNumber,
           payment_method: paymentMethod,
           servant_name: servantName,

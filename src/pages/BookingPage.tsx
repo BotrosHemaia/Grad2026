@@ -3,6 +3,7 @@ import { FirebaseError } from 'firebase/app'
 import type { Seat } from '../types/models'
 import { subscribeToSeats } from '../services/seatService'
 import { createReservation } from '../services/reservationService'
+import { sendTelegramReservationAlert } from '../services/telegramNotificationService'
 import SeatGrid from '../components/SeatGrid'
 import SeatLegend from '../components/SeatLegend'
 import BookingForm, { type BookingFormValues } from '../components/BookingForm'
@@ -74,7 +75,14 @@ export default function BookingPage({ onBack }: BookingPageProps) {
     setSubmitting(true)
     setSubmitError(null)
     try {
-      await createReservation({ guest_name: values.ticket_names[0], ticket_names: values.ticket_names, phone_number: values.phone_number, payment_method: values.payment_method, servant_name: values.servant_name, seat_ids: selectedSeatIds })
+      const reservationId = await createReservation({ guest_name: values.ticket_names[0], ticket_names: values.ticket_names, phone_number: values.phone_number, payment_method: values.payment_method, servant_name: values.servant_name, seat_ids: selectedSeatIds })
+      try {
+        await sendTelegramReservationAlert(reservationId)
+      } catch (notificationError) {
+        // The reservation is already safely stored. Do not ask the guest to
+        // submit again just because the organizer alert could not be delivered.
+        console.warn('Reservation saved, but Telegram alert failed:', notificationError)
+      }
       setConfirmation({ seatNumbers: selectedSeatNumbers, ticketNames: values.ticket_names, totalAmount })
       setStep('confirmation')
       window.scrollTo({ top: 0, behavior: 'smooth' })
