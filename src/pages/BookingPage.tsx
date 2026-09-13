@@ -109,8 +109,8 @@ export default function BookingPage({ onBack }: BookingPageProps) {
   return <div id="booking-page" className="booking-shell">
     <div className="booking-frame">
       <header className="booking-nav">
-        <button type="button" onClick={onBack} className="booking-logo"><i className="fas fa-graduation-cap" aria-hidden="true" /> Class of 2026</button>
-        <span>A brighter tomorrow together</span>
+        <button type="button" onClick={onBack} className="booking-logo"><i className="fas fa-graduation-cap" aria-hidden="true" /> CALLED - CLASS OF 2026</button>
+        <span lang="ar" dir="rtl">«لا تخف لأني فديتك، دعوتك باسمك، أنت لي» إشعياء 43:1</span>
       </header>
 
       <div className="booking-topline">

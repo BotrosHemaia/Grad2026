@@ -4,6 +4,7 @@
 .booking-logo { display:flex; align-items:center; gap:12px; border:0; background:none; color:#0a2540; font-family:'Playfair Display',Georgia,serif; font-size:1.65rem; cursor:pointer; }
 .booking-logo i { color:#0a2540; }
 .booking-nav > span { max-width:160px; color:#8b6a2d; font-family:'Playfair Display',Georgia,serif; font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; line-height:1.5; text-align:right; }
+.booking-nav > span[lang="ar"] { max-width:430px; font-family:Tahoma,Arial,sans-serif; font-size:.82rem; letter-spacing:0; text-transform:none; line-height:1.8; }
 .booking-topline { padding:24px 3.5% 20px; display:grid; grid-template-columns:minmax(300px,1fr) minmax(480px,.9fr); align-items:end; gap:32px; }
 .booking-topline h1,.details-heading h2,.selection-card h2,.details-summary h2,.confirmation-card h2 { margin:8px 0 3px; color:#0a2540; font-family:'Playfair Display',Georgia,serif; font-weight:500; }
 .booking-topline h1 { font-size:clamp(2rem,3.2vw,3rem); line-height:1.1; }

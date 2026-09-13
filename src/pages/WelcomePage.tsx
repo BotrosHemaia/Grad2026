@@ -5,9 +5,8 @@ export default function WelcomePage({ onBookNow }: WelcomePageProps) {
   <section id="hero-section" className="golden-hero" aria-labelledby="event-title">
    <img className="golden-hero-image" src="/images/graduation-hero.png" alt="" fetchPriority="high" />
    <div className="golden-hero-copy">
-    <p className="golden-eyebrow">You're cordially invited</p>
     <h1 id="event-title">{EVENT_CONFIG.title}</h1>
-    <p className="golden-intro">An evening to remember. A class to celebrate.</p>
+    <p className="golden-intro" lang="ar" dir="rtl">«لا تخف لأني فديتك، دعوتك باسمك، أنت لي» إشعياء 43:1</p>
     <button id="book-now-button" type="button" onClick={onBookNow} className="golden-button">Reserve your seat <span aria-hidden="true">→</span></button>
    </div>
   </section>
@@ -17,7 +16,7 @@ export default function WelcomePage({ onBookNow }: WelcomePageProps) {
     <div className="golden-detail"><i className="far fa-clock" aria-hidden="true" /><div><dt>Time</dt><dd>{EVENT_CONFIG.time}</dd></div></div>
     <div className="golden-detail"><i className="fas fa-location-dot" aria-hidden="true" /><div><dt>Venue</dt><dd lang="ar" dir="rtl">{EVENT_CONFIG.venue}</dd></div></div>
    </dl>
-   <p className="golden-keepsake">One class. A lifetime of memories.</p>
+   <p className="golden-keepsake" lang="ar" dir="rtl">CALLED — أنت مدعو … لأنك له.</p>
   </section>
  </div>
 }

@@ -40,9 +40,9 @@ function App() {
     <div id="app-root" className={`golden-app min-h-screen bg-gray-50 flex flex-col ${view === 'welcome' ? 'golden-home' : ''}`}>
       {view === 'welcome' && <header id="app-header" className="golden-header">
         <div className="golden-header-inner">
-          <button type="button" className="golden-brand" onClick={() => setView('welcome')} aria-label="Class of 2026 home">
+          <button type="button" className="golden-brand" onClick={() => setView('welcome')} aria-label="CALLED - CLASS OF 2026 home">
             <i className="fas fa-graduation-cap" aria-hidden="true" />
-            <span>Class of 2026</span>
+            <span>CALLED - CLASS OF 2026</span>
           </button>
           <nav className="golden-nav" aria-label="Event navigation">
             <a href="#event-details">Event details</a>
@@ -62,7 +62,7 @@ function App() {
       </main>
 
       <footer id="app-footer" className="text-center text-xs text-gray-400 py-6 border-t border-gray-200 bg-white">
-        <p>Graduation Party 2026</p>
+        <p lang="ar" dir="rtl">اجتماع الملاك غبريال للشباب الجامعي</p>
         <a href="/admin" className="hover:text-navy-600 underline underline-offset-2 transition-colors">
           Admin Login
         </a>

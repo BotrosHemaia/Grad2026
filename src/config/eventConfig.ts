@@ -3,12 +3,11 @@
  * Edit these values for your actual graduation party event.
  */
 export const EVENT_CONFIG = {
-  title: 'Graduation Ceremony & Party 2026',
-  date: 'Thursday, October 1, 2026',
-  time: '6:00 PM – 10:00 PM',
+  title: 'CALLED',
+  date: 'الأحد، 4 أكتوبر 2026',
+  time: '5:00 م',
   venue: 'مسرح الملاك طوسون - شبرا',
-  description:
-    'Join us to celebrate the graduating class of 2026! An evening of music, dinner, and unforgettable memories. Reserve your seat now — spots are limited.',
+  description: 'CALLED — أنت مدعو … لأنك له.',
 }
 
 /**
